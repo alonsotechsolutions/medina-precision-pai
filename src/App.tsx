@@ -120,7 +120,7 @@ function App() {
       name: 'Jennifer Martinez',
       location: 'Warner Robins, GA',
       rating: 5,
-      text: 'Medina Family Painting did an amazing job on our whole house. The crew was professional, clean, and the quality is outstanding. Best painting company we\'ve used!'
+      text: 'Medina Precision Painting did an amazing job on our whole house. The crew was professional, clean, and the quality is outstanding. Best painting company we\'ve used!'
     },
     {
       name: 'David Chen',
@@ -178,7 +178,7 @@ function App() {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-2">
               <PaintBrush size={28} weight="duotone" className="text-primary" />
-              <span className="text-xl font-bold text-foreground">Medina Family Painting</span>
+              <span className="text-xl font-bold text-foreground">Medina Precision Painting</span>
             </div>
             <div className="flex items-center gap-4">
               <a href="tel:4789552341" className="hidden sm:flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
@@ -327,10 +327,10 @@ function App() {
             >
               <Badge className="mb-4 bg-accent text-accent-foreground">Trusted Since 2006</Badge>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6" style={{ letterSpacing: '-0.02em', lineHeight: '1.1' }}>
-                Warner Robins Premier Family Painting Contractor
+                Warner Robins Premier Precision Painting Contractor
               </h1>
               <p className="text-lg sm:text-xl mb-8 text-primary-foreground/90 leading-relaxed">
-                Professional interior and exterior painting services for Warner Robins and surrounding Central Georgia. Quality workmanship, honest pricing, and results that last.
+                Professional interior and exterior painting services for Warner Robins and surrounding Central Georgia. Precision workmanship, honest pricing, and results that last.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -525,7 +525,7 @@ function App() {
             </motion.div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto mb-12">
               {[
-                { icon: Medal, title: 'Family-Owned Business', desc: 'Trusted family business serving Central Georgia with pride' },
+                { icon: Medal, title: 'Professional Business', desc: 'Trusted painting business serving Central Georgia with pride' },
                 { icon: Users, title: 'Expert Craftsmen', desc: 'Trained, background-checked professionals on every crew' },
                 { icon: ShieldCheck, title: 'Fully Insured', desc: '$2M liability coverage and workers compensation' },
                 { icon: CurrencyDollar, title: 'Upfront Pricing', desc: 'Detailed estimates with no hidden fees or surprises' },
@@ -589,13 +589,13 @@ function App() {
                 viewport={{ once: true }}
               >
                 <h2 className="text-3xl sm:text-4xl font-bold mb-6 tracking-tight" style={{ letterSpacing: '-0.01em' }}>
-                  About Medina Family Painting
+                  About Medina Precision Painting
                 </h2>
                 <p className="text-lg text-muted-foreground mb-4 leading-relaxed">
-                  Medina Family Painting is a trusted family-owned business serving homeowners and businesses throughout Warner Robins and Central Georgia. We bring generations of painting expertise and a commitment to treating every project like it's our own home.
+                  Medina Precision Painting is a trusted painting business serving homeowners and businesses throughout Warner Robins and Central Georgia. We bring generations of painting expertise and a commitment to precision in every project.
                 </p>
                 <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
-                  Our family takes pride in every project, treating your property with the same care and attention we'd give our own homes. From meticulous surface preparation to the final coat, we ensure every detail meets our high standards and exceeds your expectations.
+                  We take pride in every project, treating your property with the same care and attention we'd give our own homes. From meticulous surface preparation to the final coat, we ensure every detail meets our high standards and exceeds your expectations.
                 </p>
                 <div className="flex flex-wrap gap-2">
                   <Badge variant="secondary">EPA Lead-Safe Certified</Badge>
@@ -721,8 +721,8 @@ function App() {
                   <EnvelopeSimple size={28} weight="duotone" className="text-primary" />
                 </div>
                 <h3 className="font-semibold mb-2">Email</h3>
-                <a href="mailto:info@medinafamilypainting.com" className="text-muted-foreground hover:text-primary transition-colors">
-                  info@medinafamilypainting.com
+                <a href="mailto:info@medinaprecisionpainting.com" className="text-muted-foreground hover:text-primary transition-colors">
+                  info@medinaprecisionpainting.com
                 </a>
               </motion.div>
               <motion.div
@@ -750,10 +750,10 @@ function App() {
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="flex items-center gap-2">
               <PaintBrush size={24} weight="duotone" />
-              <span className="font-bold">Medina Family Painting</span>
+              <span className="font-bold">Medina Precision Painting</span>
             </div>
             <div className="text-center md:text-right text-sm opacity-80">
-              <p>© 2024 Medina Family Painting. All rights reserved.</p>
+              <p>© 2024 Medina Precision Painting. All rights reserved.</p>
               <p className="mt-1">Licensed, Bonded & Insured • Family-Owned & Operated</p>
             </div>
           </div>
