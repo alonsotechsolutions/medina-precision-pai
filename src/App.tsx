@@ -110,10 +110,10 @@ function App() {
   ]
 
   const benefits = [
-    { icon: ShieldCheck, text: 'Licensed & Insured' },
-    { icon: Clock, text: '18+ Years Experience' },
-    { icon: Sparkle, text: 'Satisfaction Guaranteed' },
-    { icon: CurrencyDollar, text: 'Transparent Pricing' }
+    { icon: ShieldCheck, text: 'Family-Owned & Operated' },
+    { icon: Clock, text: '18+ Years Serving Families' },
+    { icon: Sparkle, text: 'Treat Your Home Like Ours' },
+    { icon: CurrencyDollar, text: 'Honest Family Pricing' }
   ]
 
   const testimonials = [
@@ -121,19 +121,19 @@ function App() {
       name: 'Jennifer Martinez',
       location: 'Warner Robins, GA',
       rating: 5,
-      text: 'Medina Precision Painting did an amazing job on our whole house. The crew was professional, clean, and the quality is outstanding. Best painting company we\'ve used!'
+      text: 'The Medina family did an amazing job painting our family home. They were respectful, patient with our kids, and treated our house like their own. A family business you can truly trust!'
     },
     {
       name: 'David Chen',
       location: 'Macon, GA',
       rating: 5,
-      text: 'We hired them for exterior painting and they exceeded expectations. Fair pricing, excellent communication, and beautiful results. Highly recommend!'
+      text: 'As a father of three, I appreciated how careful and clean they were. They worked around our family schedule and the kids loved watching them work. True professionals with family values!'
     },
     {
       name: 'Sarah Williams',
       location: 'Perry, GA',
       rating: 5,
-      text: 'From color consultation to final walkthrough, everything was perfect. They transformed our dated kitchen cabinets into something magazine-worthy.'
+      text: 'It\'s rare to find a family business that cares this much. They treated us like extended family and the results are beautiful. Our home has never looked better!'
     }
   ]
 
@@ -325,12 +325,12 @@ function App() {
               transition={{ duration: 0.7 }}
               className="max-w-3xl"
             >
-              <Badge className="mb-4 bg-accent text-accent-foreground">Trusted Since 2006</Badge>
+              <Badge className="mb-4 bg-accent text-accent-foreground">Family-Owned Since 2006</Badge>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6" style={{ letterSpacing: '-0.02em', lineHeight: '1.1' }}>
-                Warner Robins Premier Precision Painting Contractor
+                Your Trusted Family Painting Partners in Warner Robins
               </h1>
               <p className="text-lg sm:text-xl mb-8 text-primary-foreground/90 leading-relaxed">
-                Professional interior and exterior painting services for Warner Robins and surrounding Central Georgia. Precision workmanship, honest pricing, and results that last.
+                As a family-owned business, we treat your home like our own. Professional painting services for families and businesses throughout Central Georgia with honest pricing and workmanship you can trust.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -384,7 +384,7 @@ function App() {
                 Complete Painting Solutions
               </h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                From residential homes to commercial properties, we deliver exceptional painting services tailored to your needs.
+                From family homes to local businesses, we deliver exceptional painting services with personal care and attention.
               </p>
             </motion.div>
             <motion.div
@@ -435,7 +435,7 @@ function App() {
                 Recent Projects
               </h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                See the quality and attention to detail that goes into every Medina Family Painting project.
+                See how we've helped Central Georgia families transform their homes with care and precision.
               </p>
             </motion.div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -471,7 +471,7 @@ function App() {
                 What Our Customers Say
               </h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Don't just take our word for it. Here's what Central Georgia homeowners and businesses say about working with us.
+                Don't just take our word for it. Here's what Central Georgia families say about working with the Medina family.
               </p>
             </motion.div>
             <div className="grid md:grid-cols-3 gap-6">
@@ -517,20 +517,20 @@ function App() {
               className="text-center mb-12"
             >
               <h2 className="text-3xl sm:text-4xl font-bold mb-4 tracking-tight" style={{ letterSpacing: '-0.01em' }}>
-                Why Choose Medina Family Painting
+                The Medina Family Difference
               </h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                We're committed to delivering outstanding results and exceptional customer service on every project.
+                As a family business, we bring personal care, integrity, and generations of craftsmanship to every home we serve.
               </p>
             </motion.div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto mb-12">
               {[
-                { icon: Medal, title: 'Professional Business', desc: 'Trusted painting business serving Central Georgia with pride' },
-                { icon: Users, title: 'Expert Craftsmen', desc: 'Trained, background-checked professionals on every crew' },
-                { icon: ShieldCheck, title: 'Fully Insured', desc: '$2M liability coverage and workers compensation' },
-                { icon: CurrencyDollar, title: 'Upfront Pricing', desc: 'Detailed estimates with no hidden fees or surprises' },
-                { icon: Sparkle, title: '2-Year Warranty', desc: 'All labor and materials backed by our guarantee' },
-                { icon: Calendar, title: 'Flexible Scheduling', desc: 'Work around your schedule with minimal disruption' }
+                { icon: Medal, title: 'Multi-Generation Expertise', desc: 'Family painting traditions passed down through generations' },
+                { icon: Users, title: 'Family-Trained Crews', desc: 'Many of our team members are family or trained by family' },
+                { icon: ShieldCheck, title: 'Family Peace of Mind', desc: 'Fully insured with $2M liability coverage for your protection' },
+                { icon: CurrencyDollar, title: 'Family-Friendly Pricing', desc: 'Honest estimates with no hidden fees—we treat you fairly' },
+                { icon: Sparkle, title: 'Family Guarantee', desc: '2-year warranty backed by our family name and reputation' },
+                { icon: Calendar, title: 'Respectful Scheduling', desc: 'We work around your family\'s schedule and routines' }
               ].map((item, index) => (
                 <motion.div
                   key={index}
@@ -557,12 +557,12 @@ function App() {
               className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto"
             >
               {[
-                'Premium Sherwin-Williams and Benjamin Moore paints',
-                'Thorough surface preparation and priming',
-                'Protection of furniture and flooring',
-                'Daily cleanup and job site maintenance',
-                'Color matching and consultation services',
-                'Lead-safe certified for older homes'
+                'Family-safe, low-VOC premium paints for healthier homes',
+                'Thorough surface preparation with attention to detail',
+                'Careful protection of your family\'s furniture and belongings',
+                'Daily cleanup—we respect your family space',
+                'Personalized color consultation for your family\'s style',
+                'Lead-safe certified to protect children and families'
               ].map((item, index) => (
                 <motion.div
                   key={index}
@@ -589,19 +589,19 @@ function App() {
                 viewport={{ once: true }}
               >
                 <h2 className="text-3xl sm:text-4xl font-bold mb-6 tracking-tight" style={{ letterSpacing: '-0.01em' }}>
-                  About Medina Precision Painting
+                  About the Medina Family
                 </h2>
                 <p className="text-lg text-muted-foreground mb-4 leading-relaxed">
-                  Medina Precision Painting is a trusted painting business serving homeowners and businesses throughout Warner Robins and Central Georgia. We bring generations of painting expertise and a commitment to precision in every project.
+                  Medina Precision Painting is a proud family-owned business serving families and businesses throughout Warner Robins and Central Georgia since 2006. What started as one family member with a paintbrush and a dream has grown into a trusted name, with family values at the heart of everything we do.
                 </p>
                 <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
-                  We take pride in every project, treating your property with the same care and attention we'd give our own homes. From meticulous surface preparation to the final coat, we ensure every detail meets our high standards and exceeds your expectations.
+                  We understand that your home is where your family creates memories, and we treat it with the same love and care we give our own. Our family teaches the next generation the importance of honest work, attention to detail, and treating customers like extended family. When you hire us, you're not just getting painters—you're getting the Medina family commitment to excellence.
                 </p>
                 <div className="flex flex-wrap gap-2">
+                  <Badge variant="secondary">Family-Owned & Operated</Badge>
                   <Badge variant="secondary">EPA Lead-Safe Certified</Badge>
-                  <Badge variant="secondary">Fully Licensed & Bonded</Badge>
-                  <Badge variant="secondary">$2M Liability Insurance</Badge>
-                  <Badge variant="secondary">BBB Accredited</Badge>
+                  <Badge variant="secondary">Fully Licensed & Insured</Badge>
+                  <Badge variant="secondary">Multi-Generation Expertise</Badge>
                 </div>
               </motion.div>
               <motion.div
@@ -630,7 +630,7 @@ function App() {
                 Serving Warner Robins & Central Georgia
               </h2>
               <p className="text-muted-foreground mb-6">
-                Proudly providing professional painting services to the following communities within 1.5 hours of Warner Robins
+                Proudly serving families and businesses in these Central Georgia communities
               </p>
             </motion.div>
             <div className="flex flex-wrap justify-center gap-3 max-w-4xl mx-auto">
@@ -665,7 +665,7 @@ function App() {
                 Ready to Transform Your Space?
               </h2>
               <p className="text-lg mb-8 text-primary-foreground/90 max-w-2xl mx-auto">
-                Get your free, no-obligation estimate today. We'll visit your property, discuss your vision, and provide a detailed quote with transparent pricing.
+                Get your free, no-obligation estimate today. We'll visit your home, listen to your family's needs, and provide an honest quote with transparent pricing.
               </p>
               <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
@@ -691,7 +691,7 @@ function App() {
                 Get In Touch
               </h2>
               <p className="text-lg text-muted-foreground">
-                We're here to answer your questions and discuss your painting project.
+                The Medina family is here to answer your questions and help bring your vision to life.
               </p>
             </motion.div>
             <div className="grid sm:grid-cols-3 gap-8 max-w-4xl mx-auto">
