@@ -118,19 +118,19 @@ function App() {
   const testimonials = [
     {
       name: 'Jennifer Martinez',
-      location: 'Marietta, GA',
+      location: 'Warner Robins, GA',
       rating: 5,
-      text: 'ColorCraft did an amazing job on our whole house. The crew was professional, clean, and the quality is outstanding. Best painting company we\'ve used!'
+      text: 'Medina Family Painting did an amazing job on our whole house. The crew was professional, clean, and the quality is outstanding. Best painting company we\'ve used!'
     },
     {
       name: 'David Chen',
-      location: 'Roswell, GA',
+      location: 'Macon, GA',
       rating: 5,
       text: 'We hired them for exterior painting and they exceeded expectations. Fair pricing, excellent communication, and beautiful results. Highly recommend!'
     },
     {
       name: 'Sarah Williams',
-      location: 'Alpharetta, GA',
+      location: 'Perry, GA',
       rating: 5,
       text: 'From color consultation to final walkthrough, everything was perfect. They transformed our dated kitchen cabinets into something magazine-worthy.'
     }
@@ -146,8 +146,8 @@ function App() {
   ]
 
   const serviceAreas = [
-    'Atlanta', 'Marietta', 'Roswell', 'Alpharetta', 'Sandy Springs', 'Dunwoody',
-    'Johns Creek', 'Smyrna', 'Kennesaw', 'Acworth', 'Woodstock', 'Canton'
+    'Warner Robins', 'Macon', 'Perry', 'Fort Valley', 'Byron', 'Centerville',
+    'Bonaire', 'Kathleen', 'Hawkinsville', 'Cochran', 'Dublin', 'Milledgeville'
   ]
 
   const containerVariants = {
@@ -178,7 +178,7 @@ function App() {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-2">
               <PaintBrush size={28} weight="duotone" className="text-primary" />
-              <span className="text-xl font-bold text-foreground">ColorCraft Painting</span>
+              <span className="text-xl font-bold text-foreground">Medina Family Painting</span>
             </div>
             <div className="flex items-center gap-4">
               <a href="tel:4789552341" className="hidden sm:flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
@@ -327,10 +327,10 @@ function App() {
             >
               <Badge className="mb-4 bg-accent text-accent-foreground">Trusted Since 2006</Badge>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6" style={{ letterSpacing: '-0.02em', lineHeight: '1.1' }}>
-                Georgia's Premier Painting Contractor
+                Warner Robins Premier Family Painting Contractor
               </h1>
               <p className="text-lg sm:text-xl mb-8 text-primary-foreground/90 leading-relaxed">
-                Professional interior and exterior painting services for Atlanta and North Georgia. Quality workmanship, honest pricing, and results that last.
+                Professional interior and exterior painting services for Warner Robins and surrounding Central Georgia. Quality workmanship, honest pricing, and results that last.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -435,7 +435,7 @@ function App() {
                 Recent Projects
               </h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                See the quality and attention to detail that goes into every ColorCraft project.
+                See the quality and attention to detail that goes into every Medina Family Painting project.
               </p>
             </motion.div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -471,7 +471,7 @@ function App() {
                 What Our Customers Say
               </h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Don't just take our word for it. Here's what Georgia homeowners and businesses say about working with us.
+                Don't just take our word for it. Here's what Central Georgia homeowners and businesses say about working with us.
               </p>
             </motion.div>
             <div className="grid md:grid-cols-3 gap-6">
@@ -517,7 +517,7 @@ function App() {
               className="text-center mb-12"
             >
               <h2 className="text-3xl sm:text-4xl font-bold mb-4 tracking-tight" style={{ letterSpacing: '-0.01em' }}>
-                Why Choose ColorCraft
+                Why Choose Medina Family Painting
               </h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
                 We're committed to delivering outstanding results and exceptional customer service on every project.
@@ -525,7 +525,7 @@ function App() {
             </motion.div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto mb-12">
               {[
-                { icon: Medal, title: 'Award-Winning Service', desc: 'Recognized for excellence in the Atlanta painting industry' },
+                { icon: Medal, title: 'Family-Owned Business', desc: 'Trusted family business serving Central Georgia with pride' },
                 { icon: Users, title: 'Expert Craftsmen', desc: 'Trained, background-checked professionals on every crew' },
                 { icon: ShieldCheck, title: 'Fully Insured', desc: '$2M liability coverage and workers compensation' },
                 { icon: CurrencyDollar, title: 'Upfront Pricing', desc: 'Detailed estimates with no hidden fees or surprises' },
@@ -589,13 +589,13 @@ function App() {
                 viewport={{ once: true }}
               >
                 <h2 className="text-3xl sm:text-4xl font-bold mb-6 tracking-tight" style={{ letterSpacing: '-0.01em' }}>
-                  About ColorCraft Painting
+                  About Medina Family Painting
                 </h2>
                 <p className="text-lg text-muted-foreground mb-4 leading-relaxed">
-                  Since 2006, ColorCraft Painting has been serving homeowners and businesses throughout Metro Atlanta and North Georgia. What started as a one-person operation has grown into a trusted team of professional painters dedicated to quality craftsmanship.
+                  Medina Family Painting is a trusted family-owned business serving homeowners and businesses throughout Warner Robins and Central Georgia. We bring generations of painting expertise and a commitment to treating every project like it's our own home.
                 </p>
                 <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
-                  Our team takes pride in every project, treating your property with the same care and attention we'd give our own homes. From meticulous surface preparation to the final coat, we ensure every detail meets our high standards and exceeds your expectations.
+                  Our family takes pride in every project, treating your property with the same care and attention we'd give our own homes. From meticulous surface preparation to the final coat, we ensure every detail meets our high standards and exceeds your expectations.
                 </p>
                 <div className="flex flex-wrap gap-2">
                   <Badge variant="secondary">EPA Lead-Safe Certified</Badge>
@@ -627,10 +627,10 @@ function App() {
               className="text-center mb-8"
             >
               <h2 className="text-2xl sm:text-3xl font-bold mb-4">
-                Serving Metro Atlanta & North Georgia
+                Serving Warner Robins & Central Georgia
               </h2>
               <p className="text-muted-foreground mb-6">
-                Proudly providing professional painting services to the following communities
+                Proudly providing professional painting services to the following communities within 1.5 hours of Warner Robins
               </p>
             </motion.div>
             <div className="flex flex-wrap justify-center gap-3 max-w-4xl mx-auto">
@@ -721,8 +721,8 @@ function App() {
                   <EnvelopeSimple size={28} weight="duotone" className="text-primary" />
                 </div>
                 <h3 className="font-semibold mb-2">Email</h3>
-                <a href="mailto:info@colorcraftpainting.com" className="text-muted-foreground hover:text-primary transition-colors">
-                  info@colorcraftpainting.com
+                <a href="mailto:info@medinafamilypainting.com" className="text-muted-foreground hover:text-primary transition-colors">
+                  info@medinafamilypainting.com
                 </a>
               </motion.div>
               <motion.div
@@ -737,7 +737,7 @@ function App() {
                 </div>
                 <h3 className="font-semibold mb-2">Service Area</h3>
                 <p className="text-muted-foreground">
-                  Metro Atlanta<br />& North Georgia
+                  Warner Robins<br />& Central Georgia
                 </p>
               </motion.div>
             </div>
@@ -750,11 +750,11 @@ function App() {
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="flex items-center gap-2">
               <PaintBrush size={24} weight="duotone" />
-              <span className="font-bold">ColorCraft Painting</span>
+              <span className="font-bold">Medina Family Painting</span>
             </div>
             <div className="text-center md:text-right text-sm opacity-80">
-              <p>© 2024 ColorCraft Painting. All rights reserved.</p>
-              <p className="mt-1">Licensed, Bonded & Insured • Serving Georgia Since 2006</p>
+              <p>© 2024 Medina Family Painting. All rights reserved.</p>
+              <p className="mt-1">Licensed, Bonded & Insured • Family-Owned & Operated</p>
             </div>
           </div>
         </div>
