@@ -176,9 +176,13 @@ function App() {
     <div className="min-h-screen bg-background">
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
-            <div className="flex items-center">
-              <img src={logoImage} alt="Medina Precision Painting" className="h-14 w-auto" />
+          <div className="flex items-center justify-between h-24">
+            <div className="flex items-center gap-3">
+              <img src={logoImage} alt="Medina Precision Painting" className="h-20 w-auto" />
+              <div className="hidden sm:block">
+                <h1 className="text-xl font-bold text-foreground leading-tight">Medina Precision Painting</h1>
+                <p className="text-xs text-muted-foreground">Family-Owned Since 2006</p>
+              </div>
             </div>
             <div className="flex items-center gap-4">
               <a href="tel:4789552341" className="hidden sm:flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
