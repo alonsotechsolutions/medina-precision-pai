@@ -1,6 +1,6 @@
 # Planning Guide
 
-A competitive, conversion-focused website for ColorCraft Painting, an Atlanta-area painting contractor. The site showcases comprehensive services, builds credibility through testimonials and certifications, displays portfolio work, and makes it easy for potential customers to request free estimates.
+A competitive, conversion-focused website for Medina Precision Painting, a Warner Robins-area painting contractor. The site showcases comprehensive services, builds credibility through testimonials and certifications, displays portfolio work, and makes it easy for potential customers to request free estimates.
 
 **Experience Qualities**:
 1. **Trustworthy** - The site must establish credibility and confidence through specific credentials, real testimonials, service area details, and professional presentation that competes with established contractors like Paint Boss GA
@@ -76,18 +76,18 @@ The design should feel professional, established, and trustworthy - conveying ex
 
 ## Color Selection
 
-A palette that balances professionalism with warmth, using rich, paint-inspired tones.
+A bold, patriotic palette inspired by the company logo featuring deep navy blue, vibrant orange-red accents, and light blue highlights - creating an energetic, trustworthy, and distinctive brand presence.
 
-- **Primary Color**: Deep teal blue (oklch(0.45 0.08 220)) - Communicates trust, professionalism, and reliability while being distinctive and memorable
+- **Primary Color**: Rich navy blue (oklch(0.35 0.15 250)) - Communicates trust, professionalism, and stability; matches the deep blue in the logo
 - **Secondary Colors**: 
-  - Warm cream/beige (oklch(0.95 0.015 85)) for backgrounds - Creates a canvas-like, inviting foundation
-  - Soft gray (oklch(0.88 0.005 220)) for supporting surfaces - Provides subtle depth and structure
-- **Accent Color**: Burnt orange/terracotta (oklch(0.62 0.15 45)) - Draws attention to CTAs and important elements, adds warmth and energy that complements the cool primary
+  - Vibrant sky blue (oklch(0.50 0.15 220)) for highlights - Adds energy and references the light blue paint strokes in the logo
+  - Soft gray-blue (oklch(0.96 0.01 250)) for backgrounds - Provides a clean, professional foundation
+- **Accent Color**: Bold orange-red (oklch(0.58 0.20 35)) - High-energy CTA color that matches "PRECISION PAINTING" text in logo, creates urgency and warmth
 - **Foreground/Background Pairings**: 
-  - Primary backgrounds (Deep Teal oklch(0.45 0.08 220)): White text (oklch(0.98 0 0)) - Ratio 9.1:1 ✓
-  - Warm Cream backgrounds (oklch(0.95 0.015 85)): Dark charcoal text (oklch(0.25 0.01 220)) - Ratio 12.8:1 ✓
-  - Accent (Burnt Orange oklch(0.62 0.15 45)): White text (oklch(0.98 0 0)) - Ratio 4.7:1 ✓
-  - Body backgrounds (White oklch(0.98 0 0)): Dark charcoal text (oklch(0.25 0.01 220)) - Ratio 13.2:1 ✓
+  - Primary backgrounds (Navy Blue oklch(0.35 0.15 250)): White text (oklch(0.99 0 0)) - Ratio 10.2:1 ✓
+  - Light backgrounds (oklch(0.96 0.01 250)): Dark navy text (oklch(0.25 0.05 250)) - Ratio 11.5:1 ✓
+  - Accent (Orange-Red oklch(0.58 0.20 35)): White text (oklch(0.99 0 0)) - Ratio 4.8:1 ✓
+  - Body backgrounds (White oklch(0.99 0 0)): Dark navy text (oklch(0.25 0.05 250)) - Ratio 12.0:1 ✓
 
 ## Font Selection
 

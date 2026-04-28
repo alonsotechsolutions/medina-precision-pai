@@ -32,6 +32,7 @@ import {
 } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 import { motion } from 'framer-motion'
+import logoImage from '@/assets/images/logo.png'
 
 function App() {
   const [formData, setFormData] = useState({
@@ -175,10 +176,9 @@ function App() {
     <div className="min-h-screen bg-background">
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-2">
-              <PaintBrush size={28} weight="duotone" className="text-primary" />
-              <span className="text-xl font-bold text-foreground">Medina Precision Painting</span>
+          <div className="flex items-center justify-between h-20">
+            <div className="flex items-center">
+              <img src={logoImage} alt="Medina Precision Painting" className="h-14 w-auto" />
             </div>
             <div className="flex items-center gap-4">
               <a href="tel:4789552341" className="hidden sm:flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
@@ -748,9 +748,8 @@ function App() {
       <footer className="bg-foreground text-background py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-            <div className="flex items-center gap-2">
-              <PaintBrush size={24} weight="duotone" />
-              <span className="font-bold">Medina Precision Painting</span>
+            <div className="flex items-center">
+              <img src={logoImage} alt="Medina Precision Painting" className="h-12 w-auto brightness-0 invert" />
             </div>
             <div className="text-center md:text-right text-sm opacity-80">
               <p>© 2024 Medina Precision Painting. All rights reserved.</p>
