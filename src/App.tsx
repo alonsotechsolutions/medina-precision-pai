@@ -1,26 +1,26 @@
 import { useState, useEffect } from 'react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Card, CardContent, CardDescription, Ca
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Badge } from '@/components/ui/badge'
-import { 
-  PaintBrush, 
-  House, 
-  Buildings, 
-  Palette, 
-  Phone, 
-  EnvelopeSimple, 
   MapPin, 
+import { 
+  ShieldCheck,
+  House, 
+  CurrencyDol
+  Palette, 
+  Image a
+  EnvelopeSimple, 
+import { t
   CheckCircle,
   Sparkle,
   Clock,
-  ShieldCheck,
+    phone: '',
   Star,
-  Quotes,
+    addre
   Calendar,
   CurrencyDollar,
   Lightbulb,
@@ -28,7 +28,7 @@ import {
   Hammer,
   Image as ImageIcon,
   Users,
-  Medal
+    set
 } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 import { motion } from 'framer-motion'
@@ -38,7 +38,7 @@ function App() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    phone: '',
+      icon: Bu
     serviceType: '',
     projectDescription: '',
     propertyType: '',
@@ -51,115 +51,115 @@ function App() {
     const handleScroll = () => {
       setShowFloatingCTA(window.scrollY > 800)
     }
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+      description: 'Not sure which colors to choose
+    }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    toast.success('Quote request received! We\'ll contact you within 24 hours.')
-    setIsDialogOpen(false)
-    setFormData({
-      name: '',
-      email: '',
-      phone: '',
-      serviceType: '',
-      projectDescription: '',
-      propertyType: '',
-      address: ''
-    })
+
+    { icon: Sparkle, text: 'Treat Your Home Like
+  ]
+  const testimonials = [
+      name: 'Jennifer Mart
+      rating: 5,
+    },
+      name: 'Dav
+      rating: 5,
+    },
+      name: 'Sarah Williams',
+      rating: 5,
+    }
+
+   
+
+    { title: 'Commer
+  ]
+  const serviceAre
+    'Bonaire', 'Kathleen', 'Hawki
+
+    hidden: { opacity: 0 },
+      
+     
+    }
+
+    hidden: { opacity: 0, y: 20 },
+      opacity: 1,
+      
+     
   }
-
-  const services = [
-    {
-      icon: House,
-      title: 'Interior Painting',
-      description: 'Transform your living spaces with flawless interior painting. We handle everything from single rooms to whole-home makeovers with precision and care.',
-      features: ['All room types', 'Trim & baseboards', 'Ceiling painting', 'Wallpaper removal']
-    },
-    {
-      icon: Buildings,
-      title: 'Exterior Painting',
-      description: 'Protect and enhance your property with premium exterior painting that stands up to Georgia weather.',
-      features: ['Full exterior', 'Deck & fence staining', 'Power washing', 'Wood repair']
-    },
-    {
-      icon: Palette,
-      title: 'Cabinet Refinishing',
-      description: 'Give your kitchen a fresh look without the cost of replacement. Expert cabinet painting and refinishing.',
-      features: ['Kitchen cabinets', 'Bathroom vanities', 'Built-in shelving', 'Color consultation']
-    },
-    {
-      icon: PaintBucket,
-      title: 'Commercial Painting',
-      description: 'Professional painting services for offices, retail spaces, and commercial properties with minimal disruption.',
-      features: ['Office buildings', 'Retail spaces', 'Warehouses', 'After-hours scheduling']
-    },
-    {
-      icon: Hammer,
-      title: 'Drywall Repair',
-      description: 'Complete drywall and plaster repair services to ensure a smooth, flawless painted surface.',
-      features: ['Hole repair', 'Texture matching', 'Water damage', 'Crack repair']
-    },
-    {
-      icon: Lightbulb,
-      title: 'Color Consultation',
-      description: 'Not sure which colors to choose? Our expert color consultants will help you find the perfect palette.',
-      features: ['In-home consultation', 'Sample testing', 'Trend guidance', 'Lighting analysis']
+  return (
+      <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border">
+          <div className="flex items-center justify-between h-24">
+      
+     
+              </div>
+            <div className="flex it
+                <Phone size={18} weight="bold" />
+              </a>
+      
+     
+                </D
+                  <DialogHeade
+                    <DialogDescription>
+                    </DialogDescription>
+      
+     
+                      
+                        value={for
+                        placeholder="John Smith"
+                    </div>
     }
   ]
 
-  const benefits = [
-    { icon: ShieldCheck, text: 'Family-Owned & Operated' },
-    { icon: Clock, text: '18+ Years Serving Families' },
-    { icon: Sparkle, text: 'Treat Your Home Like Ours' },
-    { icon: CurrencyDollar, text: 'Honest Family Pricing' }
-  ]
+                    
+                      />
+                    <div className="space-y-2">
+                      <Input
+                        type="tel"
+   
 
   const testimonials = [
-    {
-      name: 'Jennifer Martinez',
-      location: 'Warner Robins, GA',
+     
+                        id="addr
+                        onChange={(e
       rating: 5,
-      text: 'The Medina family did an amazing job painting our family home. They were respectful, patient with our kids, and treated our house like their own. A family business you can truly trust!'
+                    <div className="space-y-2">
     },
-    {
-      name: 'David Chen',
-      location: 'Macon, GA',
+     
+                      >
+                          <S
       rating: 5,
-      text: 'As a father of three, I appreciated how careful and clean they were. They worked around our family schedule and the kids loved watching them work. True professionals with family values!'
+                          <SelectItem value="exterior">Exterior Painting</SelectItem>
     },
-    {
+     
       name: 'Sarah Williams',
-      location: 'Perry, GA',
+                    <div cla
       rating: 5,
-      text: 'It\'s rare to find a family business that cares this much. They treated us like extended family and the results are beautiful. Our home has never looked better!'
+                        value={formData.propertyType}
     }
   ]
 
-  const galleryImages = [
-    { title: 'Modern Living Room', category: 'Interior' },
-    { title: 'Exterior Transformation', category: 'Exterior' },
-    { title: 'Kitchen Cabinet Refresh', category: 'Cabinets' },
-    { title: 'Master Bedroom Suite', category: 'Interior' },
-    { title: 'Commercial Office Space', category: 'Commercial' },
-    { title: 'Historic Home Exterior', category: 'Exterior' }
-  ]
+                         
+                      </Select>
+                    <div className="space-y-2">
+                      <Textarea
+                        value={formData.projectDescription}
+                        placeholder="Tell us about your project (
+                      />
+   
 
-  const serviceAreas = [
-    'Warner Robins', 'Macon', 'Perry', 'Fort Valley', 'Byron', 'Centerville',
-    'Bonaire', 'Kathleen', 'Hawkinsville', 'Cochran', 'Dublin', 'Milledgeville'
-  ]
+                </Dialog
+            </div>
+        </div>
 
-  const containerVariants = {
+
+          animate={{ opacity:
     hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
+            <D
+                G
+            </Dialo
+        </motion.div>
+
     }
-  }
+   
 
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -176,14 +176,10 @@ function App() {
     <div className="min-h-screen bg-background">
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-24">
-            <div className="flex items-center gap-3">
-              <img src={logoImage} alt="Medina Precision Painting" className="h-20 w-auto" />
-              <div className="hidden sm:block">
-                <h1 className="text-xl font-bold text-foreground leading-tight">Medina Precision Painting</h1>
-                <p className="text-xs text-muted-foreground">Family-Owned Since 2006</p>
-              </div>
-            </div>
+          <div className="flex items-center justify-between h-20">
+            <div className="flex items-center">
+              <img src={logoImage} alt="Medina Precision Painting" className="h-14 w-auto" />
+                <m
             <div className="flex items-center gap-4">
               <a href="tel:4789552341" className="hidden sm:flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
                 <Phone size={18} weight="bold" />
@@ -252,121 +248,121 @@ function App() {
                         onValueChange={(value) => setFormData({ ...formData, serviceType: value })}
                       >
                         <SelectTrigger id="service-type">
-                          <SelectValue placeholder="Select a service" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="interior">Interior Painting</SelectItem>
-                          <SelectItem value="exterior">Exterior Painting</SelectItem>
-                          <SelectItem value="both">Interior & Exterior</SelectItem>
-                          <SelectItem value="cabinets">Cabinet Refinishing</SelectItem>
-                          <SelectItem value="commercial">Commercial Painting</SelectItem>
-                          <SelectItem value="drywall">Drywall Repair</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="property-type">Property Type *</Label>
-                      <Select
-                        required
-                        value={formData.propertyType}
-                        onValueChange={(value) => setFormData({ ...formData, propertyType: value })}
-                      >
-                        <SelectTrigger id="property-type">
-                          <SelectValue placeholder="Select property type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="residential">Residential</SelectItem>
-                          <SelectItem value="commercial">Commercial</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="description">Project Description</Label>
-                      <Textarea
-                        id="description"
-                        value={formData.projectDescription}
-                        onChange={(e) => setFormData({ ...formData, projectDescription: e.target.value })}
-                        placeholder="Tell us about your project (rooms, square footage, timeline, etc.)"
-                        rows={4}
-                      />
-                    </div>
-                    <Button type="submit" className="w-full bg-primary hover:bg-primary/90">
-                      Submit Request
-                    </Button>
-                  </form>
-                </DialogContent>
-              </Dialog>
+                          <CardDescription>{testimonial.location}</CardD
+                      </div>
+                    <CardContent>
+                    </CardContent>
+                </motion.div>
             </div>
-          </div>
-        </div>
-      </header>
-
-      {showFloatingCTA && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="fixed bottom-6 right-6 z-40"
-        >
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground shadow-lg">
-                Get Free Quote
-              </Button>
-            </DialogTrigger>
-          </Dialog>
-        </motion.div>
-      )}
-
-      <main className="pt-16">
-        <section className="relative bg-gradient-to-br from-primary via-primary to-primary/80 text-primary-foreground overflow-hidden">
-          <div className="absolute inset-0 opacity-10" style={{
-            backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 10px, currentColor 10px, currentColor 11px)`
-          }}></div>
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32 relative">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7 }}
-              className="max-w-3xl"
-            >
-              <Badge className="mb-4 bg-accent text-accent-foreground">Family-Owned Since 2006</Badge>
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6" style={{ letterSpacing: '-0.02em', lineHeight: '1.1' }}>
-                Your Trusted Family Painting Partners in Warner Robins
-              </h1>
-              <p className="text-lg sm:text-xl mb-8 text-primary-foreground/90 leading-relaxed">
-                As a family-owned business, we treat your home like our own. Professional painting services for families and businesses throughout Central Georgia with honest pricing and workmanship you can trust.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground text-base">
-                      <Calendar size={20} className="mr-2" />
-                      Schedule Free Estimate
-                    </Button>
-                  </DialogTrigger>
-                </Dialog>
-                <Button size="lg" variant="outline" asChild className="bg-transparent border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10">
-                  <a href="tel:4789552341">
-                    <Phone size={20} className="mr-2" />
-                    (478) 955-2341
-                  </a>
-                </Button>
-              </div>
-            </motion.div>
-          </div>
         </section>
-
-        <section className="py-12 bg-muted/50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-              {benefits.map((benefit, index) => (
+        <section className="py-20 bg-muted/30">
+            <motion.div
+              whileInView={{ opacity: 1,
+              className="text-c
+              <h2 classNam
+              </h2>
+                As a family business, we bring personal care, integrity, and
+            </motion.div>
+              {[
+                { icon: Users, title: 'Family-Trained
+                { icon: CurrencyDollar, title: 'Family-Friendly Pricing', desc: 'Honest estimates wi
+                { icon:
                 <motion.div
-                  key={index}
                   initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                  className="flex flex-col items-center text-center gap-2"
+                  viewport={{ once: true
+                  className="flex flex-
+                  <div className="w-14 h-14 rounded-full bg-primary/10 flex items-
+                  </div>
+                    <h3 className="font-
+                  </div>
+              ))}
+            <motion.div
+              whileInView={{ opacity: 1 }}
+              className="grid s
+              {[
+                'Thorough surface preparation with attentio
+                'Daily cleanup—we respect your family space',
+                'Lead-safe certified to protect children and families'
+                <motion.div
+                  initia
+                  viewport
+                  className="flex items-start gap-3"
+                  <CheckCircle size=
+                </motion.div>
+            </motion.div>
+        </section>
+        <section classN
+            <div c
+                
+              
+               
+
+                  Medina Pr
+                <p 
+                </p>
+                  <Badge variant="second
+                  <Badge variant="secondary">Full
+         
+              <motion.div
+                whileInView={{ opac
+                className="relative"
+                <div className
+                </div>
+            </div>
+        </section>
+        <section clas
+        
+
+              className="text-
+              <h2 className="text-2xl sm:text-3xl font-bold mb-4">
+              </h2>
+                Proudly serving families and businesses in these Central Georgia communities
+            </motio
+              {serviceAreas.map((area, index) => (
+                  key={
+                  whileInView={{ opacity: 1, 
+                  transition={{ delay: index
+                  <Badge variant="outline" c
+                  </Badge>
+             
+          </div>
+
+          <div className="absolute inset-0 opacity-5" style={{
+          }}></div>
+            <motion.div
+              whileInView={{ opacity: 1, y: 0 }}
+            >
+                Ready to Transform Your Space?
+              <p className="text-lg mb-8 text-primary-foreground/90 max-w-2
+              </p>
+                <DialogTrigger asChild>
+                    <Calendar size={20} className="mr-2" />
+                  </Button>
+              </Dialog>
+          </div>
+
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              initial={{ opacity: 0, y: 20 
+              viewport={{ once: true }}
+            >
+                Get In
+              <p classNam
+              </p>
+            <div classNam
+                
+                vi
+
+                <div className="w-14 h-14 round
+                </div>
+                <a href="tel:4789552341" className="text-muted-fore
+                </a>
+              <motion.div
+                whileInView={
+                transition={{ delay: 0.2 }}
+              >
+                  <EnvelopeSimple size={28}
+                <h3 className="font-semibold mb-2">Em
+                  info@medinaprecisionpainting.com
                 >
                   <benefit.icon size={32} weight="duotone" className="text-primary" />
                   <span className="text-sm font-semibold text-foreground">{benefit.text}</span>
@@ -388,7 +384,7 @@ function App() {
                 Complete Painting Solutions
               </h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                From family homes to local businesses, we deliver exceptional painting services with personal care and attention.
+                From residential homes to commercial properties, we deliver exceptional painting services tailored to your needs.
               </p>
             </motion.div>
             <motion.div
@@ -439,7 +435,7 @@ function App() {
                 Recent Projects
               </h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                See how we've helped Central Georgia families transform their homes with care and precision.
+                See the quality and attention to detail that goes into every Medina Family Painting project.
               </p>
             </motion.div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -475,7 +471,7 @@ function App() {
                 What Our Customers Say
               </h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Don't just take our word for it. Here's what Central Georgia families say about working with the Medina family.
+                Don't just take our word for it. Here's what Central Georgia homeowners and businesses say about working with us.
               </p>
             </motion.div>
             <div className="grid md:grid-cols-3 gap-6">
@@ -521,20 +517,20 @@ function App() {
               className="text-center mb-12"
             >
               <h2 className="text-3xl sm:text-4xl font-bold mb-4 tracking-tight" style={{ letterSpacing: '-0.01em' }}>
-                The Medina Family Difference
+                Why Choose Medina Family Painting
               </h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                As a family business, we bring personal care, integrity, and generations of craftsmanship to every home we serve.
+                We're committed to delivering outstanding results and exceptional customer service on every project.
               </p>
             </motion.div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto mb-12">
               {[
-                { icon: Medal, title: 'Multi-Generation Expertise', desc: 'Family painting traditions passed down through generations' },
-                { icon: Users, title: 'Family-Trained Crews', desc: 'Many of our team members are family or trained by family' },
-                { icon: ShieldCheck, title: 'Family Peace of Mind', desc: 'Fully insured with $2M liability coverage for your protection' },
-                { icon: CurrencyDollar, title: 'Family-Friendly Pricing', desc: 'Honest estimates with no hidden fees—we treat you fairly' },
-                { icon: Sparkle, title: 'Family Guarantee', desc: '2-year warranty backed by our family name and reputation' },
-                { icon: Calendar, title: 'Respectful Scheduling', desc: 'We work around your family\'s schedule and routines' }
+                { icon: Medal, title: 'Professional Business', desc: 'Trusted painting business serving Central Georgia with pride' },
+                { icon: Users, title: 'Expert Craftsmen', desc: 'Trained, background-checked professionals on every crew' },
+                { icon: ShieldCheck, title: 'Fully Insured', desc: '$2M liability coverage and workers compensation' },
+                { icon: CurrencyDollar, title: 'Upfront Pricing', desc: 'Detailed estimates with no hidden fees or surprises' },
+                { icon: Sparkle, title: '2-Year Warranty', desc: 'All labor and materials backed by our guarantee' },
+                { icon: Calendar, title: 'Flexible Scheduling', desc: 'Work around your schedule with minimal disruption' }
               ].map((item, index) => (
                 <motion.div
                   key={index}
@@ -561,12 +557,12 @@ function App() {
               className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto"
             >
               {[
-                'Family-safe, low-VOC premium paints for healthier homes',
-                'Thorough surface preparation with attention to detail',
-                'Careful protection of your family\'s furniture and belongings',
-                'Daily cleanup—we respect your family space',
-                'Personalized color consultation for your family\'s style',
-                'Lead-safe certified to protect children and families'
+                'Premium Sherwin-Williams and Benjamin Moore paints',
+                'Thorough surface preparation and priming',
+                'Protection of furniture and flooring',
+                'Daily cleanup and job site maintenance',
+                'Color matching and consultation services',
+                'Lead-safe certified for older homes'
               ].map((item, index) => (
                 <motion.div
                   key={index}
@@ -593,19 +589,19 @@ function App() {
                 viewport={{ once: true }}
               >
                 <h2 className="text-3xl sm:text-4xl font-bold mb-6 tracking-tight" style={{ letterSpacing: '-0.01em' }}>
-                  About the Medina Family
+                  About Medina Precision Painting
                 </h2>
                 <p className="text-lg text-muted-foreground mb-4 leading-relaxed">
-                  Medina Precision Painting is a proud family-owned business serving families and businesses throughout Warner Robins and Central Georgia since 2006. What started as one family member with a paintbrush and a dream has grown into a trusted name, with family values at the heart of everything we do.
+                  Medina Precision Painting is a trusted painting business serving homeowners and businesses throughout Warner Robins and Central Georgia. We bring generations of painting expertise and a commitment to precision in every project.
                 </p>
                 <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
-                  We understand that your home is where your family creates memories, and we treat it with the same love and care we give our own. Our family teaches the next generation the importance of honest work, attention to detail, and treating customers like extended family. When you hire us, you're not just getting painters—you're getting the Medina family commitment to excellence.
+                  We take pride in every project, treating your property with the same care and attention we'd give our own homes. From meticulous surface preparation to the final coat, we ensure every detail meets our high standards and exceeds your expectations.
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  <Badge variant="secondary">Family-Owned & Operated</Badge>
                   <Badge variant="secondary">EPA Lead-Safe Certified</Badge>
-                  <Badge variant="secondary">Fully Licensed & Insured</Badge>
-                  <Badge variant="secondary">Multi-Generation Expertise</Badge>
+                  <Badge variant="secondary">Fully Licensed & Bonded</Badge>
+                  <Badge variant="secondary">$2M Liability Insurance</Badge>
+                  <Badge variant="secondary">BBB Accredited</Badge>
                 </div>
               </motion.div>
               <motion.div
@@ -634,7 +630,7 @@ function App() {
                 Serving Warner Robins & Central Georgia
               </h2>
               <p className="text-muted-foreground mb-6">
-                Proudly serving families and businesses in these Central Georgia communities
+                Proudly providing professional painting services to the following communities within 1.5 hours of Warner Robins
               </p>
             </motion.div>
             <div className="flex flex-wrap justify-center gap-3 max-w-4xl mx-auto">
@@ -669,7 +665,7 @@ function App() {
                 Ready to Transform Your Space?
               </h2>
               <p className="text-lg mb-8 text-primary-foreground/90 max-w-2xl mx-auto">
-                Get your free, no-obligation estimate today. We'll visit your home, listen to your family's needs, and provide an honest quote with transparent pricing.
+                Get your free, no-obligation estimate today. We'll visit your property, discuss your vision, and provide a detailed quote with transparent pricing.
               </p>
               <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
@@ -695,7 +691,7 @@ function App() {
                 Get In Touch
               </h2>
               <p className="text-lg text-muted-foreground">
-                The Medina family is here to answer your questions and help bring your vision to life.
+                We're here to answer your questions and discuss your painting project.
               </p>
             </motion.div>
             <div className="grid sm:grid-cols-3 gap-8 max-w-4xl mx-auto">
@@ -704,11 +700,11 @@ function App() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.1 }}
-                className="text-center"
+
               >
                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                   <Phone size={28} weight="duotone" className="text-primary" />
-                </div>
+
                 <h3 className="font-semibold mb-2">Phone</h3>
                 <a href="tel:4789552341" className="text-muted-foreground hover:text-primary transition-colors">
                   (478) 955-2341
@@ -719,11 +715,11 @@ function App() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.2 }}
-                className="text-center"
+
               >
                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                   <EnvelopeSimple size={28} weight="duotone" className="text-primary" />
-                </div>
+
                 <h3 className="font-semibold mb-2">Email</h3>
                 <a href="mailto:info@medinaprecisionpainting.com" className="text-muted-foreground hover:text-primary transition-colors">
                   info@medinaprecisionpainting.com
@@ -734,11 +730,11 @@ function App() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.3 }}
-                className="text-center"
+
               >
                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                   <MapPin size={28} weight="duotone" className="text-primary" />
-                </div>
+
                 <h3 className="font-semibold mb-2">Service Area</h3>
                 <p className="text-muted-foreground">
                   Warner Robins<br />& Central Georgia
@@ -746,24 +742,24 @@ function App() {
               </motion.div>
             </div>
           </div>
-        </section>
+
       </main>
 
       <footer className="bg-foreground text-background py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-            <div className="flex items-center">
+
               <img src={logoImage} alt="Medina Precision Painting" className="h-12 w-auto brightness-0 invert" />
-            </div>
+
             <div className="text-center md:text-right text-sm opacity-80">
               <p>© 2024 Medina Precision Painting. All rights reserved.</p>
               <p className="mt-1">Licensed, Bonded & Insured • Family-Owned & Operated</p>
-            </div>
-          </div>
-        </div>
-      </footer>
-    </div>
-  )
-}
 
-export default App
+          </div>
+
+      </footer>
+
+  )
+
+
+
