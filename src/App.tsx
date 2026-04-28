@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
@@ -6,7 +6,6 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'
 import { 
   PaintBrush, 
@@ -19,7 +18,17 @@ import {
   CheckCircle,
   Sparkle,
   Clock,
-  ShieldCheck
+  ShieldCheck,
+  Star,
+  Quotes,
+  Calendar,
+  CurrencyDollar,
+  Lightbulb,
+  PaintBucket,
+  Hammer,
+  Image as ImageIcon,
+  Users,
+  Medal
 } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 import { motion } from 'framer-motion'
@@ -31,9 +40,19 @@ function App() {
     phone: '',
     serviceType: '',
     projectDescription: '',
-    propertyType: ''
+    propertyType: '',
+    address: ''
   })
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [showFloatingCTA, setShowFloatingCTA] = useState(false)
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowFloatingCTA(window.scrollY > 800)
+    }
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -45,7 +64,8 @@ function App() {
       phone: '',
       serviceType: '',
       projectDescription: '',
-      propertyType: ''
+      propertyType: '',
+      address: ''
     })
   }
 
@@ -53,25 +73,81 @@ function App() {
     {
       icon: House,
       title: 'Interior Painting',
-      description: 'Transform your living spaces with expert interior painting. From single rooms to whole-home refreshes.'
+      description: 'Transform your living spaces with flawless interior painting. We handle everything from single rooms to whole-home makeovers with precision and care.',
+      features: ['All room types', 'Trim & baseboards', 'Ceiling painting', 'Wallpaper removal']
     },
     {
       icon: Buildings,
       title: 'Exterior Painting',
-      description: 'Protect and beautify your property with durable exterior painting that withstands the elements.'
+      description: 'Protect and enhance your property with premium exterior painting that stands up to Georgia weather.',
+      features: ['Full exterior', 'Deck & fence staining', 'Power washing', 'Wood repair']
     },
     {
       icon: Palette,
-      title: 'Specialty Finishes',
-      description: 'Unique decorative finishes, textures, and custom color matching for distinctive results.'
+      title: 'Cabinet Refinishing',
+      description: 'Give your kitchen a fresh look without the cost of replacement. Expert cabinet painting and refinishing.',
+      features: ['Kitchen cabinets', 'Bathroom vanities', 'Built-in shelving', 'Color consultation']
+    },
+    {
+      icon: PaintBucket,
+      title: 'Commercial Painting',
+      description: 'Professional painting services for offices, retail spaces, and commercial properties with minimal disruption.',
+      features: ['Office buildings', 'Retail spaces', 'Warehouses', 'After-hours scheduling']
+    },
+    {
+      icon: Hammer,
+      title: 'Drywall Repair',
+      description: 'Complete drywall and plaster repair services to ensure a smooth, flawless painted surface.',
+      features: ['Hole repair', 'Texture matching', 'Water damage', 'Crack repair']
+    },
+    {
+      icon: Lightbulb,
+      title: 'Color Consultation',
+      description: 'Not sure which colors to choose? Our expert color consultants will help you find the perfect palette.',
+      features: ['In-home consultation', 'Sample testing', 'Trend guidance', 'Lighting analysis']
     }
   ]
 
   const benefits = [
     { icon: ShieldCheck, text: 'Licensed & Insured' },
-    { icon: Clock, text: '15+ Years Experience' },
+    { icon: Clock, text: '18+ Years Experience' },
     { icon: Sparkle, text: 'Satisfaction Guaranteed' },
-    { icon: CheckCircle, text: 'Free Estimates' }
+    { icon: CurrencyDollar, text: 'Transparent Pricing' }
+  ]
+
+  const testimonials = [
+    {
+      name: 'Jennifer Martinez',
+      location: 'Marietta, GA',
+      rating: 5,
+      text: 'ColorCraft did an amazing job on our whole house. The crew was professional, clean, and the quality is outstanding. Best painting company we\'ve used!'
+    },
+    {
+      name: 'David Chen',
+      location: 'Roswell, GA',
+      rating: 5,
+      text: 'We hired them for exterior painting and they exceeded expectations. Fair pricing, excellent communication, and beautiful results. Highly recommend!'
+    },
+    {
+      name: 'Sarah Williams',
+      location: 'Alpharetta, GA',
+      rating: 5,
+      text: 'From color consultation to final walkthrough, everything was perfect. They transformed our dated kitchen cabinets into something magazine-worthy.'
+    }
+  ]
+
+  const galleryImages = [
+    { title: 'Modern Living Room', category: 'Interior' },
+    { title: 'Exterior Transformation', category: 'Exterior' },
+    { title: 'Kitchen Cabinet Refresh', category: 'Cabinets' },
+    { title: 'Master Bedroom Suite', category: 'Interior' },
+    { title: 'Commercial Office Space', category: 'Commercial' },
+    { title: 'Historic Home Exterior', category: 'Exterior' }
+  ]
+
+  const serviceAreas = [
+    'Atlanta', 'Marietta', 'Roswell', 'Alpharetta', 'Sandy Springs', 'Dunwoody',
+    'Johns Creek', 'Smyrna', 'Kennesaw', 'Acworth', 'Woodstock', 'Canton'
   ]
 
   const containerVariants = {
@@ -97,112 +173,145 @@ function App() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-2">
               <PaintBrush size={28} weight="duotone" className="text-primary" />
               <span className="text-xl font-bold text-foreground">ColorCraft Painting</span>
             </div>
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-              <DialogTrigger asChild>
-                <Button className="bg-accent hover:bg-accent/90 text-accent-foreground">
-                  Get Free Quote
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[500px]">
-                <DialogHeader>
-                  <DialogTitle>Request a Free Quote</DialogTitle>
-                  <DialogDescription>
-                    Fill out the form below and we'll contact you within 24 hours with a detailed estimate.
-                  </DialogDescription>
-                </DialogHeader>
-                <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Name *</Label>
-                    <Input
-                      id="name"
-                      required
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      placeholder="John Smith"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email *</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      required
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      placeholder="john@example.com"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">Phone *</Label>
-                    <Input
-                      id="phone"
-                      type="tel"
-                      required
-                      value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      placeholder="(555) 123-4567"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="service-type">Service Type *</Label>
-                    <Select
-                      required
-                      value={formData.serviceType}
-                      onValueChange={(value) => setFormData({ ...formData, serviceType: value })}
-                    >
-                      <SelectTrigger id="service-type">
-                        <SelectValue placeholder="Select a service" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="interior">Interior Painting</SelectItem>
-                        <SelectItem value="exterior">Exterior Painting</SelectItem>
-                        <SelectItem value="both">Interior & Exterior</SelectItem>
-                        <SelectItem value="specialty">Specialty Finishes</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="property-type">Property Type *</Label>
-                    <Select
-                      required
-                      value={formData.propertyType}
-                      onValueChange={(value) => setFormData({ ...formData, propertyType: value })}
-                    >
-                      <SelectTrigger id="property-type">
-                        <SelectValue placeholder="Select property type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="residential">Residential</SelectItem>
-                        <SelectItem value="commercial">Commercial</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="description">Project Description</Label>
-                    <Textarea
-                      id="description"
-                      value={formData.projectDescription}
-                      onChange={(e) => setFormData({ ...formData, projectDescription: e.target.value })}
-                      placeholder="Tell us about your project..."
-                      rows={4}
-                    />
-                  </div>
-                  <Button type="submit" className="w-full bg-primary hover:bg-primary/90">
-                    Submit Request
+            <div className="flex items-center gap-4">
+              <a href="tel:5551234567" className="hidden sm:flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
+                <Phone size={18} weight="bold" />
+                (555) 123-4567
+              </a>
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button className="bg-accent hover:bg-accent/90 text-accent-foreground">
+                    Get Free Quote
                   </Button>
-                </form>
-              </DialogContent>
-            </Dialog>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[550px] max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Request a Free Quote</DialogTitle>
+                    <DialogDescription>
+                      Fill out the form below and we'll contact you within 24 hours with a detailed estimate.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="name">Name *</Label>
+                      <Input
+                        id="name"
+                        required
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        placeholder="John Smith"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="email">Email *</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        required
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        placeholder="john@example.com"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="phone">Phone *</Label>
+                      <Input
+                        id="phone"
+                        type="tel"
+                        required
+                        value={formData.phone}
+                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                        placeholder="(555) 123-4567"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="address">Property Address</Label>
+                      <Input
+                        id="address"
+                        value={formData.address}
+                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                        placeholder="123 Main St, Atlanta, GA"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="service-type">Service Type *</Label>
+                      <Select
+                        required
+                        value={formData.serviceType}
+                        onValueChange={(value) => setFormData({ ...formData, serviceType: value })}
+                      >
+                        <SelectTrigger id="service-type">
+                          <SelectValue placeholder="Select a service" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="interior">Interior Painting</SelectItem>
+                          <SelectItem value="exterior">Exterior Painting</SelectItem>
+                          <SelectItem value="both">Interior & Exterior</SelectItem>
+                          <SelectItem value="cabinets">Cabinet Refinishing</SelectItem>
+                          <SelectItem value="commercial">Commercial Painting</SelectItem>
+                          <SelectItem value="drywall">Drywall Repair</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="property-type">Property Type *</Label>
+                      <Select
+                        required
+                        value={formData.propertyType}
+                        onValueChange={(value) => setFormData({ ...formData, propertyType: value })}
+                      >
+                        <SelectTrigger id="property-type">
+                          <SelectValue placeholder="Select property type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="residential">Residential</SelectItem>
+                          <SelectItem value="commercial">Commercial</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="description">Project Description</Label>
+                      <Textarea
+                        id="description"
+                        value={formData.projectDescription}
+                        onChange={(e) => setFormData({ ...formData, projectDescription: e.target.value })}
+                        placeholder="Tell us about your project (rooms, square footage, timeline, etc.)"
+                        rows={4}
+                      />
+                    </div>
+                    <Button type="submit" className="w-full bg-primary hover:bg-primary/90">
+                      Submit Request
+                    </Button>
+                  </form>
+                </DialogContent>
+              </Dialog>
+            </div>
           </div>
         </div>
       </header>
+
+      {showFloatingCTA && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="fixed bottom-6 right-6 z-40"
+        >
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground shadow-lg">
+                Get Free Quote
+              </Button>
+            </DialogTrigger>
+          </Dialog>
+        </motion.div>
+      )}
 
       <main className="pt-16">
         <section className="relative bg-gradient-to-br from-primary via-primary to-primary/80 text-primary-foreground overflow-hidden">
@@ -216,24 +325,27 @@ function App() {
               transition={{ duration: 0.7 }}
               className="max-w-3xl"
             >
-              <Badge className="mb-4 bg-accent text-accent-foreground">Trusted Since 2008</Badge>
+              <Badge className="mb-4 bg-accent text-accent-foreground">Trusted Since 2006</Badge>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6" style={{ letterSpacing: '-0.02em', lineHeight: '1.1' }}>
-                Professional Painting Services That Transform Your Space
+                Georgia's Premier Painting Contractor
               </h1>
               <p className="text-lg sm:text-xl mb-8 text-primary-foreground/90 leading-relaxed">
-                Expert interior and exterior painting for residential and commercial properties. Quality craftsmanship, premium materials, and exceptional results.
+                Professional interior and exterior painting services for Atlanta and North Georgia. Quality workmanship, honest pricing, and results that last.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                   <DialogTrigger asChild>
                     <Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground text-base">
-                      Get Free Quote
+                      <Calendar size={20} className="mr-2" />
+                      Schedule Free Estimate
                     </Button>
                   </DialogTrigger>
                 </Dialog>
-                <Button size="lg" variant="outline" className="bg-transparent border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10">
-                  <Phone size={20} className="mr-2" />
-                  (555) 123-4567
+                <Button size="lg" variant="outline" asChild className="bg-transparent border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10">
+                  <a href="tel:5551234567">
+                    <Phone size={20} className="mr-2" />
+                    (555) 123-4567
+                  </a>
                 </Button>
               </div>
             </motion.div>
@@ -269,10 +381,10 @@ function App() {
               className="text-center mb-12"
             >
               <h2 className="text-3xl sm:text-4xl font-bold mb-4 tracking-tight" style={{ letterSpacing: '-0.01em' }}>
-                Our Services
+                Complete Painting Solutions
               </h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                From single rooms to entire properties, we deliver exceptional painting services tailored to your needs.
+                From residential homes to commercial properties, we deliver exceptional painting services tailored to your needs.
               </p>
             </motion.div>
             <motion.div
@@ -280,7 +392,7 @@ function App() {
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
-              className="grid md:grid-cols-3 gap-6"
+              className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
             >
               {services.map((service, index) => (
                 <motion.div key={index} variants={itemVariants}>
@@ -292,14 +404,107 @@ function App() {
                       <CardTitle className="text-xl">{service.title}</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <CardDescription className="text-base leading-relaxed">
+                      <CardDescription className="text-base leading-relaxed mb-4">
                         {service.description}
                       </CardDescription>
+                      <ul className="space-y-2">
+                        {service.features.map((feature, idx) => (
+                          <li key={idx} className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <CheckCircle size={16} weight="fill" className="text-primary shrink-0" />
+                            {feature}
+                          </li>
+                        ))}
+                      </ul>
                     </CardContent>
                   </Card>
                 </motion.div>
               ))}
             </motion.div>
+          </div>
+        </section>
+
+        <section className="py-20 bg-muted/30">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-12"
+            >
+              <h2 className="text-3xl sm:text-4xl font-bold mb-4 tracking-tight" style={{ letterSpacing: '-0.01em' }}>
+                Recent Projects
+              </h2>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                See the quality and attention to detail that goes into every ColorCraft project.
+              </p>
+            </motion.div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {galleryImages.map((image, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                  className="group relative aspect-[4/3] rounded-xl overflow-hidden bg-gradient-to-br from-primary/20 to-accent/20 border-2 border-border hover:border-primary transition-all duration-300"
+                >
+                  <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">
+                    <ImageIcon size={48} weight="duotone" className="text-primary/40 mb-4" />
+                    <h3 className="text-lg font-semibold text-foreground mb-2">{image.title}</h3>
+                    <Badge variant="secondary">{image.category}</Badge>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="py-20 bg-background">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-12"
+            >
+              <h2 className="text-3xl sm:text-4xl font-bold mb-4 tracking-tight" style={{ letterSpacing: '-0.01em' }}>
+                What Our Customers Say
+              </h2>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Don't just take our word for it. Here's what Georgia homeowners and businesses say about working with us.
+              </p>
+            </motion.div>
+            <div className="grid md:grid-cols-3 gap-6">
+              {testimonials.map((testimonial, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <Card className="h-full">
+                    <CardHeader>
+                      <div className="flex items-center gap-1 mb-2">
+                        {[...Array(testimonial.rating)].map((_, i) => (
+                          <Star key={i} size={18} weight="fill" className="text-accent" />
+                        ))}
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <Quotes size={24} weight="duotone" className="text-primary shrink-0" />
+                        <div>
+                          <CardTitle className="text-lg">{testimonial.name}</CardTitle>
+                          <CardDescription>{testimonial.location}</CardDescription>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-muted-foreground leading-relaxed">{testimonial.text}</p>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
           </div>
         </section>
 
@@ -318,6 +523,33 @@ function App() {
                 We're committed to delivering outstanding results and exceptional customer service on every project.
               </p>
             </motion.div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto mb-12">
+              {[
+                { icon: Medal, title: 'Award-Winning Service', desc: 'Recognized for excellence in the Atlanta painting industry' },
+                { icon: Users, title: 'Expert Craftsmen', desc: 'Trained, background-checked professionals on every crew' },
+                { icon: ShieldCheck, title: 'Fully Insured', desc: '$2M liability coverage and workers compensation' },
+                { icon: CurrencyDollar, title: 'Upfront Pricing', desc: 'Detailed estimates with no hidden fees or surprises' },
+                { icon: Sparkle, title: '2-Year Warranty', desc: 'All labor and materials backed by our guarantee' },
+                { icon: Calendar, title: 'Flexible Scheduling', desc: 'Work around your schedule with minimal disruption' }
+              ].map((item, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                  className="flex flex-col items-center text-center gap-3"
+                >
+                  <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
+                    <item.icon size={28} weight="duotone" className="text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-foreground mb-1">{item.title}</h3>
+                    <p className="text-sm text-muted-foreground">{item.desc}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
             <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
@@ -325,12 +557,12 @@ function App() {
               className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto"
             >
               {[
-                'Premium quality paints and materials',
-                'Detailed preparation and clean execution',
-                'Respectful of your home and schedule',
-                'Transparent pricing with no surprises',
-                'Fully licensed, bonded, and insured',
-                'Warranty on all workmanship'
+                'Premium Sherwin-Williams and Benjamin Moore paints',
+                'Thorough surface preparation and priming',
+                'Protection of furniture and flooring',
+                'Daily cleanup and job site maintenance',
+                'Color matching and consultation services',
+                'Lead-safe certified for older homes'
               ].map((item, index) => (
                 <motion.div
                   key={index}
@@ -360,15 +592,16 @@ function App() {
                   About ColorCraft Painting
                 </h2>
                 <p className="text-lg text-muted-foreground mb-4 leading-relaxed">
-                  With over 15 years of experience serving homeowners and businesses throughout the region, ColorCraft Painting has built a reputation for excellence, reliability, and exceptional craftsmanship.
+                  Since 2006, ColorCraft Painting has been serving homeowners and businesses throughout Metro Atlanta and North Georgia. What started as a one-person operation has grown into a trusted team of professional painters dedicated to quality craftsmanship.
                 </p>
                 <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
-                  Our team of skilled painters takes pride in every project, treating your property with the same care and attention we'd give our own homes. From meticulous surface preparation to the final coat, we ensure every detail meets our high standards.
+                  Our team takes pride in every project, treating your property with the same care and attention we'd give our own homes. From meticulous surface preparation to the final coat, we ensure every detail meets our high standards and exceeds your expectations.
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  <Badge variant="secondary">EPA Certified</Badge>
-                  <Badge variant="secondary">Lead-Safe Certified</Badge>
-                  <Badge variant="secondary">Fully Insured</Badge>
+                  <Badge variant="secondary">EPA Lead-Safe Certified</Badge>
+                  <Badge variant="secondary">Fully Licensed & Bonded</Badge>
+                  <Badge variant="secondary">$2M Liability Insurance</Badge>
+                  <Badge variant="secondary">BBB Accredited</Badge>
                 </div>
               </motion.div>
               <motion.div
@@ -381,6 +614,39 @@ function App() {
                   <PaintBrush size={120} weight="duotone" className="text-primary/30" />
                 </div>
               </motion.div>
+            </div>
+          </div>
+        </section>
+
+        <section className="py-16 bg-muted/30">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-8"
+            >
+              <h2 className="text-2xl sm:text-3xl font-bold mb-4">
+                Serving Metro Atlanta & North Georgia
+              </h2>
+              <p className="text-muted-foreground mb-6">
+                Proudly providing professional painting services to the following communities
+              </p>
+            </motion.div>
+            <div className="flex flex-wrap justify-center gap-3 max-w-4xl mx-auto">
+              {serviceAreas.map((area, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.05 }}
+                >
+                  <Badge variant="outline" className="text-sm px-4 py-2">
+                    {area}
+                  </Badge>
+                </motion.div>
+              ))}
             </div>
           </div>
         </section>
@@ -398,13 +664,14 @@ function App() {
               <h2 className="text-3xl sm:text-4xl font-bold mb-4 tracking-tight" style={{ letterSpacing: '-0.01em' }}>
                 Ready to Transform Your Space?
               </h2>
-              <p className="text-lg mb-8 text-primary-foreground/90">
-                Get your free, no-obligation quote today. We'll provide a detailed estimate and answer all your questions.
+              <p className="text-lg mb-8 text-primary-foreground/90 max-w-2xl mx-auto">
+                Get your free, no-obligation estimate today. We'll visit your property, discuss your vision, and provide a detailed quote with transparent pricing.
               </p>
               <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
                   <Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground">
-                    Request Free Quote
+                    <Calendar size={20} className="mr-2" />
+                    Schedule Free Estimate
                   </Button>
                 </DialogTrigger>
               </Dialog>
@@ -470,7 +737,7 @@ function App() {
                 </div>
                 <h3 className="font-semibold mb-2">Service Area</h3>
                 <p className="text-muted-foreground">
-                  Greater Metro Area<br />& Surrounding Communities
+                  Metro Atlanta<br />& North Georgia
                 </p>
               </motion.div>
             </div>
@@ -487,7 +754,7 @@ function App() {
             </div>
             <div className="text-center md:text-right text-sm opacity-80">
               <p>© 2024 ColorCraft Painting. All rights reserved.</p>
-              <p className="mt-1">Licensed, Bonded & Insured</p>
+              <p className="mt-1">Licensed, Bonded & Insured • Serving Georgia Since 2006</p>
             </div>
           </div>
         </div>
