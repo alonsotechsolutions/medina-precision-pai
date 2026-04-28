@@ -1,34 +1,29 @@
 import { useState, useEffect } from 'react'
-import { Card, CardContent, CardDescription, Ca
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-  MapPin, 
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Badge } from '@/components/ui/badge'
 import { 
-  ShieldCheck,
-  House, 
-  CurrencyDol
-  Palette, 
-  Image a
+  Phone,
+  MapPin, 
   EnvelopeSimple, 
-import { t
   CheckCircle,
-  Sparkle,
-  Clock,
-    phone: '',
   Star,
-    addre
   Calendar,
-  CurrencyDollar,
-  Lightbulb,
-  PaintBucket,
-  Hammer,
-  Image as ImageIcon,
+  PaintBrush,
+  ShieldCheck,
+  Medal,
   Users,
-    set
+  CurrencyDollar,
+  Sparkle,
+  House,
+  Palette,
+  Image as ImageIcon,
+  Quotes
 } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 import { motion } from 'framer-motion'
@@ -38,11 +33,11 @@ function App() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-      icon: Bu
+    phone: '',
+    address: '',
     serviceType: '',
-    projectDescription: '',
     propertyType: '',
-    address: ''
+    projectDescription: ''
   })
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [showFloatingCTA, setShowFloatingCTA] = useState(false)
@@ -51,115 +46,108 @@ function App() {
     const handleScroll = () => {
       setShowFloatingCTA(window.scrollY > 800)
     }
-      description: 'Not sure which colors to choose
-    }
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
-
-    { icon: Sparkle, text: 'Treat Your Home Like
-  ]
-  const testimonials = [
-      name: 'Jennifer Mart
-      rating: 5,
-    },
-      name: 'Dav
-      rating: 5,
-    },
-      name: 'Sarah Williams',
-      rating: 5,
-    }
-
-   
-
-    { title: 'Commer
-  ]
-  const serviceAre
-    'Bonaire', 'Kathleen', 'Hawki
-
-    hidden: { opacity: 0 },
-      
-     
-    }
-
-    hidden: { opacity: 0, y: 20 },
-      opacity: 1,
-      
-     
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    toast.success('Quote request submitted! We\'ll contact you within 24 hours.')
+    setIsDialogOpen(false)
+    setFormData({
+      name: '',
+      email: '',
+      phone: '',
+      address: '',
+      serviceType: '',
+      propertyType: '',
+      projectDescription: ''
+    })
   }
-  return (
-      <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border">
-          <div className="flex items-center justify-between h-24">
-      
-     
-              </div>
-            <div className="flex it
-                <Phone size={18} weight="bold" />
-              </a>
-      
-     
-                </D
-                  <DialogHeade
-                    <DialogDescription>
-                    </DialogDescription>
-      
-     
-                      
-                        value={for
-                        placeholder="John Smith"
-                    </div>
+
+  const services = [
+    {
+      icon: House,
+      title: 'Interior Painting',
+      description: 'Transform your living spaces with expert interior painting that brings new life to every room.',
+      features: ['Wall & ceiling painting', 'Trim & door refinishing', 'Color consultation', 'Smooth, flawless finish']
+    },
+    {
+      icon: Palette,
+      title: 'Exterior Painting',
+      description: 'Protect and beautify your home\'s exterior with durable, weather-resistant paint solutions.',
+      features: ['House painting', 'Deck & fence staining', 'Power washing', 'Surface preparation']
+    },
+    {
+      icon: PaintBrush,
+      title: 'Cabinet Refinishing',
+      description: 'Modernize your kitchen or bathroom with professional cabinet painting and refinishing services.',
+      features: ['Kitchen cabinets', 'Bathroom vanities', 'Built-in furniture', 'Custom color matching']
+    },
+    {
+      icon: Sparkle,
+      title: 'Pressure Washing',
+      description: 'Restore your property\'s appearance with thorough pressure washing services.',
+      features: ['House washing', 'Driveway cleaning', 'Deck restoration', 'Pre-paint preparation']
+    },
+    {
+      icon: ShieldCheck,
+      title: 'Commercial Painting',
+      description: 'Professional painting services for offices, retail spaces, and commercial properties.',
+      features: ['Minimal disruption', 'Flexible scheduling', 'Large-scale projects', 'Quality materials']
+    },
+    {
+      icon: Medal,
+      title: 'Specialty Finishes',
+      description: 'Unique textures, patterns, and custom finishes to make your space truly distinctive.',
+      features: ['Decorative painting', 'Accent walls', 'Textured finishes', 'Custom designs']
     }
   ]
-
-                    
-                      />
-                    <div className="space-y-2">
-                      <Input
-                        type="tel"
-   
 
   const testimonials = [
-     
-                        id="addr
-                        onChange={(e
+    {
+      name: 'Jennifer Martinez',
+      location: 'Warner Robins, GA',
       rating: 5,
-                    <div className="space-y-2">
+      text: 'Medina Precision Painting did an amazing job on our home. Professional, punctual, and the quality is outstanding. Highly recommend!'
     },
-     
-                      >
-                          <S
+    {
+      name: 'David Thompson',
+      location: 'Macon, GA',
       rating: 5,
-                          <SelectItem value="exterior">Exterior Painting</SelectItem>
+      text: 'Best painting company in Central Georgia! They transformed our office space and stayed on budget. Will definitely use them again.'
     },
-     
+    {
       name: 'Sarah Williams',
-                    <div cla
+      location: 'Perry, GA',
       rating: 5,
-                        value={formData.propertyType}
+      text: 'From the free estimate to the final walkthrough, everything was handled with care and professionalism. Our house looks brand new!'
     }
   ]
 
-                         
-                      </Select>
-                    <div className="space-y-2">
-                      <Textarea
-                        value={formData.projectDescription}
-                        placeholder="Tell us about your project (
-                      />
-   
+  const galleryImages = [
+    { title: 'Modern Living Room', category: 'Interior' },
+    { title: 'Victorian Exterior', category: 'Exterior' },
+    { title: 'Kitchen Cabinet Refresh', category: 'Cabinets' },
+    { title: 'Commercial Office', category: 'Commercial' },
+    { title: 'Deck Staining', category: 'Exterior' },
+    { title: 'Accent Wall Design', category: 'Interior' }
+  ]
 
-                </Dialog
-            </div>
-        </div>
+  const serviceAreas = [
+    'Warner Robins', 'Macon', 'Perry', 'Centerville', 'Byron', 'Fort Valley',
+    'Bonaire', 'Kathleen', 'Hawkinsville', 'Eastman', 'Dublin', 'Milledgeville'
+  ]
 
-
-          animate={{ opacity:
+  const containerVariants = {
     hidden: { opacity: 0 },
-            <D
-                G
-            </Dialo
-        </motion.div>
-
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
     }
-   
+  }
 
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -179,7 +167,7 @@ function App() {
           <div className="flex items-center justify-between h-20">
             <div className="flex items-center">
               <img src={logoImage} alt="Medina Precision Painting" className="h-14 w-auto" />
-                <m
+            </div>
             <div className="flex items-center gap-4">
               <a href="tel:4789552341" className="hidden sm:flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
                 <Phone size={18} weight="bold" />
@@ -237,7 +225,7 @@ function App() {
                         id="address"
                         value={formData.address}
                         onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                        placeholder="123 Main St, Atlanta, GA"
+                        placeholder="123 Main St, Warner Robins, GA"
                       />
                     </div>
                     <div className="space-y-2">
@@ -248,127 +236,124 @@ function App() {
                         onValueChange={(value) => setFormData({ ...formData, serviceType: value })}
                       >
                         <SelectTrigger id="service-type">
-                          <CardDescription>{testimonial.location}</CardD
-                      </div>
-                    <CardContent>
-                    </CardContent>
-                </motion.div>
-            </div>
-        </section>
-        <section className="py-20 bg-muted/30">
-            <motion.div
-              whileInView={{ opacity: 1,
-              className="text-c
-              <h2 classNam
-              </h2>
-                As a family business, we bring personal care, integrity, and
-            </motion.div>
-              {[
-                { icon: Users, title: 'Family-Trained
-                { icon: CurrencyDollar, title: 'Family-Friendly Pricing', desc: 'Honest estimates wi
-                { icon:
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  viewport={{ once: true
-                  className="flex flex-
-                  <div className="w-14 h-14 rounded-full bg-primary/10 flex items-
-                  </div>
-                    <h3 className="font-
-                  </div>
-              ))}
-            <motion.div
-              whileInView={{ opacity: 1 }}
-              className="grid s
-              {[
-                'Thorough surface preparation with attentio
-                'Daily cleanup—we respect your family space',
-                'Lead-safe certified to protect children and families'
-                <motion.div
-                  initia
-                  viewport
-                  className="flex items-start gap-3"
-                  <CheckCircle size=
-                </motion.div>
-            </motion.div>
-        </section>
-        <section classN
-            <div c
-                
-              
-               
-
-                  Medina Pr
-                <p 
-                </p>
-                  <Badge variant="second
-                  <Badge variant="secondary">Full
-         
-              <motion.div
-                whileInView={{ opac
-                className="relative"
-                <div className
-                </div>
-            </div>
-        </section>
-        <section clas
-        
-
-              className="text-
-              <h2 className="text-2xl sm:text-3xl font-bold mb-4">
-              </h2>
-                Proudly serving families and businesses in these Central Georgia communities
-            </motio
-              {serviceAreas.map((area, index) => (
-                  key={
-                  whileInView={{ opacity: 1, 
-                  transition={{ delay: index
-                  <Badge variant="outline" c
-                  </Badge>
-             
-          </div>
-
-          <div className="absolute inset-0 opacity-5" style={{
-          }}></div>
-            <motion.div
-              whileInView={{ opacity: 1, y: 0 }}
-            >
-                Ready to Transform Your Space?
-              <p className="text-lg mb-8 text-primary-foreground/90 max-w-2
-              </p>
-                <DialogTrigger asChild>
-                    <Calendar size={20} className="mr-2" />
-                  </Button>
+                          <SelectValue placeholder="Select a service" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="interior">Interior Painting</SelectItem>
+                          <SelectItem value="exterior">Exterior Painting</SelectItem>
+                          <SelectItem value="cabinets">Cabinet Refinishing</SelectItem>
+                          <SelectItem value="commercial">Commercial Painting</SelectItem>
+                          <SelectItem value="pressure-washing">Pressure Washing</SelectItem>
+                          <SelectItem value="other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="property-type">Property Type</Label>
+                      <Select
+                        value={formData.propertyType}
+                        onValueChange={(value) => setFormData({ ...formData, propertyType: value })}
+                      >
+                        <SelectTrigger id="property-type">
+                          <SelectValue placeholder="Select property type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="residential">Residential</SelectItem>
+                          <SelectItem value="commercial">Commercial</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="project-description">Project Description</Label>
+                      <Textarea
+                        id="project-description"
+                        value={formData.projectDescription}
+                        onChange={(e) => setFormData({ ...formData, projectDescription: e.target.value })}
+                        placeholder="Tell us about your project (optional)"
+                        rows={4}
+                      />
+                    </div>
+                    <Button type="submit" className="w-full bg-primary hover:bg-primary/90">
+                      Submit Request
+                    </Button>
+                  </form>
+                </DialogContent>
               </Dialog>
-          </div>
-
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              initial={{ opacity: 0, y: 20 
-              viewport={{ once: true }}
-            >
-                Get In
-              <p classNam
-              </p>
-            <div classNam
-                
-                vi
-
-                <div className="w-14 h-14 round
-                </div>
-                <a href="tel:4789552341" className="text-muted-fore
-                </a>
-              <motion.div
-                whileInView={
-                transition={{ delay: 0.2 }}
-              >
-                  <EnvelopeSimple size={28}
-                <h3 className="font-semibold mb-2">Em
-                  info@medinaprecisionpainting.com
-                >
-                  <benefit.icon size={32} weight="duotone" className="text-primary" />
-                  <span className="text-sm font-semibold text-foreground">{benefit.text}</span>
-                </motion.div>
-              ))}
             </div>
+          </div>
+        </div>
+      </header>
+
+      {showFloatingCTA && (
+        <motion.div
+          initial={{ opacity: 0, y: 100 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 100 }}
+          className="fixed bottom-6 right-6 z-40"
+        >
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button size="lg" className="shadow-xl bg-accent hover:bg-accent/90 text-accent-foreground">
+                Get Free Quote
+              </Button>
+            </DialogTrigger>
+          </Dialog>
+        </motion.div>
+      )}
+
+      <main className="pt-20">
+        <section className="relative py-24 sm:py-32 bg-gradient-to-br from-primary via-secondary to-accent overflow-hidden">
+          <div className="absolute inset-0 opacity-10" style={{
+            backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 35px, currentColor 35px, currentColor 36px)`
+          }}></div>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="text-center text-primary-foreground"
+            >
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 tracking-tight" style={{ letterSpacing: '-0.02em' }}>
+                Transform Your Space with<br />Precision & Care
+              </h1>
+              <p className="text-lg sm:text-xl mb-8 text-primary-foreground/90 max-w-3xl mx-auto">
+                Family-owned painting business serving Warner Robins and Central Georgia since 2006. Professional craftsmanship, honest pricing, and outstanding results guaranteed.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground text-lg px-8">
+                      <Calendar size={24} className="mr-2" />
+                      Get Free Estimate
+                    </Button>
+                  </DialogTrigger>
+                </Dialog>
+                <a href="tel:4789552341">
+                  <Button size="lg" variant="secondary" className="text-lg px-8">
+                    <Phone size={24} className="mr-2" />
+                    (478) 955-2341
+                  </Button>
+                </a>
+              </div>
+              <div className="mt-12 flex flex-wrap justify-center gap-6 text-sm">
+                {[
+                  { icon: ShieldCheck, text: 'Fully Licensed & Insured' },
+                  { icon: Medal, text: '18+ Years Experience' },
+                  { icon: Sparkle, text: '2-Year Warranty' }
+                ].map((benefit, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 + index * 0.1 }}
+                    className="flex items-center gap-2 bg-background/10 backdrop-blur-sm rounded-full px-4 py-2"
+                  >
+                    <benefit.icon size={20} weight="duotone" className="text-primary-foreground" />
+                    <span className="text-sm font-semibold text-primary-foreground">{benefit.text}</span>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
           </div>
         </section>
 
@@ -435,7 +420,7 @@ function App() {
                 Recent Projects
               </h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                See the quality and attention to detail that goes into every Medina Family Painting project.
+                See the quality and attention to detail that goes into every Medina Precision Painting project.
               </p>
             </motion.div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -517,7 +502,7 @@ function App() {
               className="text-center mb-12"
             >
               <h2 className="text-3xl sm:text-4xl font-bold mb-4 tracking-tight" style={{ letterSpacing: '-0.01em' }}>
-                Why Choose Medina Family Painting
+                Why Choose Medina Precision Painting
               </h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
                 We're committed to delivering outstanding results and exceptional customer service on every project.
@@ -700,11 +685,11 @@ function App() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.1 }}
-
+                className="text-center"
               >
                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                   <Phone size={28} weight="duotone" className="text-primary" />
-
+                </div>
                 <h3 className="font-semibold mb-2">Phone</h3>
                 <a href="tel:4789552341" className="text-muted-foreground hover:text-primary transition-colors">
                   (478) 955-2341
@@ -715,11 +700,11 @@ function App() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.2 }}
-
+                className="text-center"
               >
                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                   <EnvelopeSimple size={28} weight="duotone" className="text-primary" />
-
+                </div>
                 <h3 className="font-semibold mb-2">Email</h3>
                 <a href="mailto:info@medinaprecisionpainting.com" className="text-muted-foreground hover:text-primary transition-colors">
                   info@medinaprecisionpainting.com
@@ -730,11 +715,11 @@ function App() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.3 }}
-
+                className="text-center"
               >
                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                   <MapPin size={28} weight="duotone" className="text-primary" />
-
+                </div>
                 <h3 className="font-semibold mb-2">Service Area</h3>
                 <p className="text-muted-foreground">
                   Warner Robins<br />& Central Georgia
@@ -742,24 +727,24 @@ function App() {
               </motion.div>
             </div>
           </div>
-
+        </section>
       </main>
 
       <footer className="bg-foreground text-background py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-
+            <div>
               <img src={logoImage} alt="Medina Precision Painting" className="h-12 w-auto brightness-0 invert" />
-
+            </div>
             <div className="text-center md:text-right text-sm opacity-80">
               <p>© 2024 Medina Precision Painting. All rights reserved.</p>
               <p className="mt-1">Licensed, Bonded & Insured • Family-Owned & Operated</p>
-
+            </div>
           </div>
-
+        </div>
       </footer>
-
+    </div>
   )
+}
 
-
-
+export default App
