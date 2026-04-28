@@ -181,9 +181,9 @@ function App() {
               <span className="text-xl font-bold text-foreground">ColorCraft Painting</span>
             </div>
             <div className="flex items-center gap-4">
-              <a href="tel:5551234567" className="hidden sm:flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
+              <a href="tel:4789552341" className="hidden sm:flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
                 <Phone size={18} weight="bold" />
-                (555) 123-4567
+                (478) 955-2341
               </a>
               <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
@@ -342,9 +342,9 @@ function App() {
                   </DialogTrigger>
                 </Dialog>
                 <Button size="lg" variant="outline" asChild className="bg-transparent border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10">
-                  <a href="tel:5551234567">
+                  <a href="tel:4789552341">
                     <Phone size={20} className="mr-2" />
-                    (555) 123-4567
+                    (478) 955-2341
                   </a>
                 </Button>
               </div>
@@ -706,8 +706,8 @@ function App() {
                   <Phone size={28} weight="duotone" className="text-primary" />
                 </div>
                 <h3 className="font-semibold mb-2">Phone</h3>
-                <a href="tel:5551234567" className="text-muted-foreground hover:text-primary transition-colors">
-                  (555) 123-4567
+                <a href="tel:4789552341" className="text-muted-foreground hover:text-primary transition-colors">
+                  (478) 955-2341
                 </a>
               </motion.div>
               <motion.div
