@@ -83,7 +83,49 @@ function App() {
     checkOwner()
   }, [])
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const sendEmailNotification = async (quote: QuoteRequest) => {
+    try {
+      const promptText = `Generate a professional email notification for a new quote request for Medina Precision Painting. 
+
+Business Details:
+- Business Name: Medina Precision Painting
+- Phone: (478) 955-2341
+- Email: info@medinaprecisionpainting.com
+
+Quote Request Details:
+- Customer Name: ${quote.name}
+- Email: ${quote.email}
+- Phone: ${quote.phone}
+- Address: ${quote.address || 'Not provided'}
+- Service Type: ${quote.serviceType}
+- Property Type: ${quote.propertyType || 'Not specified'}
+- Project Description: ${quote.projectDescription || 'No description provided'}
+- Submitted: ${new Date(quote.submittedAt).toLocaleString()}
+
+Generate a JSON object with the following structure:
+{
+  "subject": "New Quote Request from [Customer Name]",
+  "body": "Professional email body in plain text format with all the details organized clearly"
+}
+
+Make the email professional, concise, and include all relevant customer information.`
+
+      const emailContent = await window.spark.llm(promptText, 'gpt-4o-mini', true)
+      const parsedEmail = JSON.parse(emailContent)
+      
+      console.log('📧 Email Notification Generated:', parsedEmail)
+      toast.info('Email notification prepared', {
+        description: `Quote request from ${quote.name} logged for review`
+      })
+      
+      return parsedEmail
+    } catch (error) {
+      console.error('Failed to generate email notification:', error)
+      toast.error('Could not prepare email notification')
+    }
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
     const newQuote: QuoteRequest = {
@@ -100,6 +142,8 @@ function App() {
     }
     
     setQuotes(currentQuotes => [newQuote, ...(currentQuotes || [])])
+    
+    await sendEmailNotification(newQuote)
     
     toast.success('Quote request submitted! We\'ll contact you within 24 hours.')
     setIsDialogOpen(false)
