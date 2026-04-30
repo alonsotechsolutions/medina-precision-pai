@@ -126,12 +126,36 @@ function App() {
   ]
 
   const galleryImages = [
-    { title: 'Modern Living Room', category: 'Interior' },
-    { title: 'Victorian Exterior', category: 'Exterior' },
-    { title: 'Kitchen Cabinet Refresh', category: 'Cabinets' },
-    { title: 'Commercial Office', category: 'Commercial' },
-    { title: 'Deck Staining', category: 'Exterior' },
-    { title: 'Accent Wall Design', category: 'Interior' }
+    { 
+      title: 'Modern Living Room', 
+      category: 'Interior',
+      image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&q=80'
+    },
+    { 
+      title: 'Victorian Exterior', 
+      category: 'Exterior',
+      image: 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&q=80'
+    },
+    { 
+      title: 'Kitchen Cabinet Refresh', 
+      category: 'Cabinets',
+      image: 'https://images.unsplash.com/photo-1556912172-45b7abe8b7e1?w=800&q=80'
+    },
+    { 
+      title: 'Commercial Office', 
+      category: 'Commercial',
+      image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80'
+    },
+    { 
+      title: 'Deck Staining', 
+      category: 'Exterior',
+      image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80'
+    },
+    { 
+      title: 'Accent Wall Design', 
+      category: 'Interior',
+      image: 'https://images.unsplash.com/photo-1615875221248-48b7dbced6b4?w=800&q=80'
+    }
   ]
 
   const serviceAreas = [
@@ -431,11 +455,15 @@ function App() {
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="group relative aspect-[4/3] rounded-xl overflow-hidden bg-gradient-to-br from-primary/20 to-accent/20 border-2 border-border hover:border-primary transition-all duration-300"
+                  className="group relative aspect-[4/3] rounded-xl overflow-hidden border-2 border-border hover:border-primary transition-all duration-300"
                 >
-                  <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">
-                    <ImageIcon size={48} weight="duotone" className="text-primary/40 mb-4" />
-                    <h3 className="text-lg font-semibold text-foreground mb-2">{image.title}</h3>
+                  <img 
+                    src={image.image} 
+                    alt={image.title}
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-foreground/90 via-foreground/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-end p-6 text-center">
+                    <h3 className="text-lg font-semibold text-background mb-2">{image.title}</h3>
                     <Badge variant="secondary">{image.category}</Badge>
                   </div>
                 </motion.div>
