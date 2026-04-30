@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { 
   Phone,
   MapPin, 
@@ -23,11 +24,28 @@ import {
   House,
   Palette,
   Image as ImageIcon,
-  Quotes
+  Quotes,
+  ClipboardText,
+  Trash,
+  Eye
 } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 import { motion } from 'framer-motion'
+import { useKV } from '@github/spark/hooks'
 import logoImage from '@/assets/images/Logo.png'
+
+interface QuoteRequest {
+  id: string
+  name: string
+  email: string
+  phone: string
+  address: string
+  serviceType: string
+  propertyType: string
+  projectDescription: string
+  status: 'new' | 'contacted' | 'quoted' | 'completed'
+  submittedAt: string
+}
 
 function App() {
   const [formData, setFormData] = useState({
@@ -41,6 +59,11 @@ function App() {
   })
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [showFloatingCTA, setShowFloatingCTA] = useState(false)
+  const [isOwner, setIsOwner] = useState(false)
+  const [showAdminPanel, setShowAdminPanel] = useState(false)
+  const [selectedQuote, setSelectedQuote] = useState<QuoteRequest | null>(null)
+  
+  const [quotes, setQuotes] = useKV<QuoteRequest[]>('quote-requests', [])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -50,8 +73,34 @@ function App() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  useEffect(() => {
+    const checkOwner = async () => {
+      const user = await window.spark.user()
+      if (user) {
+        setIsOwner(user.isOwner)
+      }
+    }
+    checkOwner()
+  }, [])
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    
+    const newQuote: QuoteRequest = {
+      id: `quote-${Date.now()}`,
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      address: formData.address,
+      serviceType: formData.serviceType,
+      propertyType: formData.propertyType,
+      projectDescription: formData.projectDescription,
+      status: 'new',
+      submittedAt: new Date().toISOString()
+    }
+    
+    setQuotes(currentQuotes => [newQuote, ...(currentQuotes || [])])
+    
     toast.success('Quote request submitted! We\'ll contact you within 24 hours.')
     setIsDialogOpen(false)
     setFormData({
@@ -63,6 +112,40 @@ function App() {
       propertyType: '',
       projectDescription: ''
     })
+  }
+
+  const updateQuoteStatus = (quoteId: string, newStatus: QuoteRequest['status']) => {
+    setQuotes(currentQuotes =>
+      (currentQuotes || []).map(quote =>
+        quote.id === quoteId ? { ...quote, status: newStatus } : quote
+      )
+    )
+    toast.success('Quote status updated')
+  }
+
+  const deleteQuote = (quoteId: string) => {
+    setQuotes(currentQuotes => (currentQuotes || []).filter(quote => quote.id !== quoteId))
+    toast.success('Quote deleted')
+    setSelectedQuote(null)
+  }
+
+  const getStatusColor = (status: QuoteRequest['status']) => {
+    switch (status) {
+      case 'new':
+        return 'bg-accent text-accent-foreground'
+      case 'contacted':
+        return 'bg-secondary text-secondary-foreground'
+      case 'quoted':
+        return 'bg-primary text-primary-foreground'
+      case 'completed':
+        return 'bg-muted text-muted-foreground'
+      default:
+        return 'bg-muted text-muted-foreground'
+    }
+  }
+
+  const getQuotesByStatus = (status: QuoteRequest['status']) => {
+    return (quotes || []).filter(quote => quote.status === status)
   }
 
   const services = [
@@ -193,6 +276,17 @@ function App() {
               <img src={logoImage} alt="Medina Precision Painting" className="h-14 w-auto" />
             </div>
             <div className="flex items-center gap-4">
+              {isOwner && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowAdminPanel(true)}
+                  className="hidden md:flex items-center gap-2"
+                >
+                  <ClipboardText size={18} weight="duotone" />
+                  View Quotes ({(quotes || []).length})
+                </Button>
+              )}
               <a href="tel:4789552341" className="hidden sm:flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
                 <Phone size={18} weight="bold" />
                 (478) 955-2341
@@ -757,6 +851,272 @@ function App() {
           </div>
         </section>
       </main>
+
+      <Dialog open={showAdminPanel} onOpenChange={setShowAdminPanel}>
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <ClipboardText size={24} weight="duotone" />
+              Quote Requests Management
+            </DialogTitle>
+            <DialogDescription>
+              View and manage all quote requests. Total: {(quotes || []).length} quotes
+            </DialogDescription>
+          </DialogHeader>
+          
+          <Tabs defaultValue="new" className="flex-1 overflow-hidden flex flex-col">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="new" className="relative">
+                New
+                {getQuotesByStatus('new').length > 0 && (
+                  <Badge className="ml-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs">
+                    {getQuotesByStatus('new').length}
+                  </Badge>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="contacted">
+                Contacted
+                {getQuotesByStatus('contacted').length > 0 && (
+                  <Badge variant="secondary" className="ml-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs">
+                    {getQuotesByStatus('contacted').length}
+                  </Badge>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="quoted">
+                Quoted
+                {getQuotesByStatus('quoted').length > 0 && (
+                  <Badge variant="secondary" className="ml-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs">
+                    {getQuotesByStatus('quoted').length}
+                  </Badge>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="completed">
+                Completed
+                {getQuotesByStatus('completed').length > 0 && (
+                  <Badge variant="secondary" className="ml-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs">
+                    {getQuotesByStatus('completed').length}
+                  </Badge>
+                )}
+              </TabsTrigger>
+            </TabsList>
+
+            {(['new', 'contacted', 'quoted', 'completed'] as const).map((status) => (
+              <TabsContent key={status} value={status} className="flex-1 overflow-y-auto mt-4 space-y-4">
+                {getQuotesByStatus(status).length === 0 ? (
+                  <div className="text-center py-12 text-muted-foreground">
+                    <ClipboardText size={48} className="mx-auto mb-4 opacity-20" />
+                    <p>No {status} quotes</p>
+                  </div>
+                ) : (
+                  getQuotesByStatus(status).map((quote) => (
+                    <Card key={quote.id} className="hover:shadow-md transition-shadow">
+                      <CardHeader>
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <CardTitle className="text-lg">{quote.name}</CardTitle>
+                            <CardDescription className="mt-1">
+                              Submitted: {new Date(quote.submittedAt).toLocaleString()}
+                            </CardDescription>
+                          </div>
+                          <Badge className={getStatusColor(quote.status)}>
+                            {quote.status.charAt(0).toUpperCase() + quote.status.slice(1)}
+                          </Badge>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="grid sm:grid-cols-2 gap-4">
+                          <div>
+                            <p className="text-sm font-semibold text-muted-foreground mb-1">Contact Info</p>
+                            <div className="space-y-1">
+                              <a href={`mailto:${quote.email}`} className="flex items-center gap-2 text-sm hover:text-primary">
+                                <EnvelopeSimple size={16} />
+                                {quote.email}
+                              </a>
+                              <a href={`tel:${quote.phone}`} className="flex items-center gap-2 text-sm hover:text-primary">
+                                <Phone size={16} />
+                                {quote.phone}
+                              </a>
+                              {quote.address && (
+                                <p className="flex items-center gap-2 text-sm text-muted-foreground">
+                                  <MapPin size={16} />
+                                  {quote.address}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                          <div>
+                            <p className="text-sm font-semibold text-muted-foreground mb-1">Project Details</p>
+                            <div className="space-y-1 text-sm">
+                              <p><span className="font-medium">Service:</span> {quote.serviceType}</p>
+                              {quote.propertyType && (
+                                <p><span className="font-medium">Property:</span> {quote.propertyType}</p>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {quote.projectDescription && (
+                          <div>
+                            <p className="text-sm font-semibold text-muted-foreground mb-1">Description</p>
+                            <p className="text-sm text-foreground bg-muted p-3 rounded-md">
+                              {quote.projectDescription}
+                            </p>
+                          </div>
+                        )}
+
+                        <div className="flex flex-wrap gap-2 pt-2 border-t">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => setSelectedQuote(quote)}
+                            className="flex items-center gap-2"
+                          >
+                            <Eye size={16} />
+                            View Details
+                          </Button>
+                          {quote.status === 'new' && (
+                            <Button
+                              size="sm"
+                              variant="secondary"
+                              onClick={() => updateQuoteStatus(quote.id, 'contacted')}
+                            >
+                              Mark Contacted
+                            </Button>
+                          )}
+                          {quote.status === 'contacted' && (
+                            <Button
+                              size="sm"
+                              variant="secondary"
+                              onClick={() => updateQuoteStatus(quote.id, 'quoted')}
+                            >
+                              Mark Quoted
+                            </Button>
+                          )}
+                          {quote.status === 'quoted' && (
+                            <Button
+                              size="sm"
+                              variant="secondary"
+                              onClick={() => updateQuoteStatus(quote.id, 'completed')}
+                            >
+                              Mark Completed
+                            </Button>
+                          )}
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => {
+                              if (confirm('Are you sure you want to delete this quote?')) {
+                                deleteQuote(quote.id)
+                              }
+                            }}
+                            className="flex items-center gap-2 ml-auto"
+                          >
+                            <Trash size={16} />
+                            Delete
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))
+                )}
+              </TabsContent>
+            ))}
+          </Tabs>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={selectedQuote !== null} onOpenChange={() => setSelectedQuote(null)}>
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+          {selectedQuote && (
+            <>
+              <DialogHeader>
+                <DialogTitle>{selectedQuote.name}</DialogTitle>
+                <DialogDescription>
+                  Quote request details
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 mt-4">
+                <div>
+                  <Label>Status</Label>
+                  <Badge className={`${getStatusColor(selectedQuote.status)} mt-1`}>
+                    {selectedQuote.status.charAt(0).toUpperCase() + selectedQuote.status.slice(1)}
+                  </Badge>
+                </div>
+                <div>
+                  <Label>Submitted</Label>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {new Date(selectedQuote.submittedAt).toLocaleString()}
+                  </p>
+                </div>
+                <div>
+                  <Label>Email</Label>
+                  <a href={`mailto:${selectedQuote.email}`} className="text-sm text-primary hover:underline block mt-1">
+                    {selectedQuote.email}
+                  </a>
+                </div>
+                <div>
+                  <Label>Phone</Label>
+                  <a href={`tel:${selectedQuote.phone}`} className="text-sm text-primary hover:underline block mt-1">
+                    {selectedQuote.phone}
+                  </a>
+                </div>
+                {selectedQuote.address && (
+                  <div>
+                    <Label>Address</Label>
+                    <p className="text-sm text-foreground mt-1">{selectedQuote.address}</p>
+                  </div>
+                )}
+                <div>
+                  <Label>Service Type</Label>
+                  <p className="text-sm text-foreground mt-1">{selectedQuote.serviceType}</p>
+                </div>
+                {selectedQuote.propertyType && (
+                  <div>
+                    <Label>Property Type</Label>
+                    <p className="text-sm text-foreground mt-1">{selectedQuote.propertyType}</p>
+                  </div>
+                )}
+                {selectedQuote.projectDescription && (
+                  <div>
+                    <Label>Project Description</Label>
+                    <p className="text-sm text-foreground mt-1 bg-muted p-3 rounded-md">
+                      {selectedQuote.projectDescription}
+                    </p>
+                  </div>
+                )}
+                <div className="flex gap-2 pt-4 border-t">
+                  <Select
+                    value={selectedQuote.status}
+                    onValueChange={(value) => updateQuoteStatus(selectedQuote.id, value as QuoteRequest['status'])}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="new">New</SelectItem>
+                      <SelectItem value="contacted">Contacted</SelectItem>
+                      <SelectItem value="quoted">Quoted</SelectItem>
+                      <SelectItem value="completed">Completed</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Button
+                    variant="destructive"
+                    onClick={() => {
+                      if (confirm('Are you sure you want to delete this quote?')) {
+                        deleteQuote(selectedQuote.id)
+                      }
+                    }}
+                    className="ml-auto"
+                  >
+                    <Trash size={16} className="mr-2" />
+                    Delete
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
 
       <footer className="bg-foreground text-background py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
