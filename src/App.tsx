@@ -8,6 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
+import { Slider } from '@/components/ui/slider'
 import { 
   Phone,
   MapPin, 
@@ -29,7 +31,22 @@ import {
   Trash,
   Eye,
   CaretLeft,
-  CaretRight
+  CaretRight,
+  Drop,
+  Hammer,
+  Wrench,
+  Calculator,
+  ChatCircleText,
+  Clock,
+  Download,
+  PaperPlaneTilt,
+  FacebookLogo,
+  InstagramLogo,
+  GoogleLogo,
+  CreditCard,
+  Lightbulb,
+  ListChecks,
+  MagnifyingGlass
 } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 import { motion } from 'framer-motion'
@@ -47,6 +64,9 @@ interface QuoteRequest {
   serviceType: string
   propertyType: string
   projectDescription: string
+  preferredDate?: string
+  budgetRange?: string
+  referralSource?: string
   status: 'new' | 'contacted' | 'quoted' | 'completed'
   submittedAt: string
 }
@@ -59,16 +79,28 @@ function App() {
     address: '',
     serviceType: '',
     propertyType: '',
-    projectDescription: ''
+    projectDescription: '',
+    preferredDate: '',
+    budgetRange: '',
+    referralSource: ''
   })
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [showFloatingCTA, setShowFloatingCTA] = useState(false)
   const [isOwner, setIsOwner] = useState(false)
   const [showAdminPanel, setShowAdminPanel] = useState(false)
   const [selectedQuote, setSelectedQuote] = useState<QuoteRequest | null>(null)
+  const [quoteSearch, setQuoteSearch] = useState('')
   const isMobile = useIsMobile()
-  
+
   const [quotes, setQuotes] = useKV<QuoteRequest[]>('quote-requests', [])
+  const [subscribers, setSubscribers] = useKV<{ email: string; subscribedAt: string }[]>('newsletter-subscribers', [])
+  const [newsletterEmail, setNewsletterEmail] = useState('')
+
+  // Paint cost estimator state
+  const [calcSqFt, setCalcSqFt] = useState<number>(1200)
+  const [calcRooms, setCalcRooms] = useState<number>(3)
+  const [calcQuality, setCalcQuality] = useState<'standard' | 'premium' | 'luxury'>('premium')
+  const [calcProject, setCalcProject] = useState<'interior' | 'exterior' | 'cabinets'>('interior')
   
   const [servicesEmblaRef, servicesEmblaApi] = useEmblaCarousel({ loop: true })
   const [galleryEmblaRef, galleryEmblaApi] = useEmblaCarousel({ loop: true })
@@ -181,6 +213,9 @@ Make the email professional, concise, and include all relevant customer informat
       serviceType: formData.serviceType,
       propertyType: formData.propertyType,
       projectDescription: formData.projectDescription,
+      preferredDate: formData.preferredDate,
+      budgetRange: formData.budgetRange,
+      referralSource: formData.referralSource,
       status: 'new',
       submittedAt: new Date().toISOString()
     }
@@ -198,7 +233,10 @@ Make the email professional, concise, and include all relevant customer informat
       address: '',
       serviceType: '',
       propertyType: '',
-      projectDescription: ''
+      projectDescription: '',
+      preferredDate: '',
+      budgetRange: '',
+      referralSource: ''
     })
   }
 
@@ -236,6 +274,200 @@ Make the email professional, concise, and include all relevant customer informat
     return (quotes || []).filter(quote => quote.status === status)
   }
 
+  const filterBySearch = (list: QuoteRequest[]) => {
+    const q = quoteSearch.trim().toLowerCase()
+    if (!q) return list
+    return list.filter(quote =>
+      quote.name.toLowerCase().includes(q) ||
+      quote.email.toLowerCase().includes(q) ||
+      quote.phone.toLowerCase().includes(q) ||
+      (quote.address || '').toLowerCase().includes(q) ||
+      (quote.serviceType || '').toLowerCase().includes(q) ||
+      (quote.projectDescription || '').toLowerCase().includes(q)
+    )
+  }
+
+  const exportQuotesCSV = () => {
+    const rows = quotes || []
+    if (rows.length === 0) {
+      toast.error('No quotes to export')
+      return
+    }
+    const headers = ['Submitted','Name','Email','Phone','Address','Service','Property','Status','PreferredDate','BudgetRange','ReferralSource','Description']
+    const escape = (v: string | undefined) => {
+      const s = (v ?? '').toString().replace(/"/g, '""')
+      return `"${s}"`
+    }
+    const csv = [
+      headers.join(','),
+      ...rows.map(r => [
+        new Date(r.submittedAt).toISOString(),
+        r.name, r.email, r.phone, r.address, r.serviceType, r.propertyType,
+        r.status, r.preferredDate, r.budgetRange, r.referralSource, r.projectDescription
+      ].map(escape).join(','))
+    ].join('\n')
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `medina-quotes-${new Date().toISOString().slice(0,10)}.csv`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+    toast.success(`Exported ${rows.length} quote${rows.length === 1 ? '' : 's'}`)
+  }
+
+  const handleNewsletterSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    const email = newsletterEmail.trim().toLowerCase()
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast.error('Please enter a valid email address')
+      return
+    }
+    setSubscribers(current => {
+      const list = current || []
+      if (list.some(s => s.email === email)) {
+        toast.info("You're already subscribed!")
+        return list
+      }
+      toast.success('Thanks for subscribing! Painting tips on the way.')
+      return [{ email, subscribedAt: new Date().toISOString() }, ...list]
+    })
+    setNewsletterEmail('')
+  }
+
+  // Paint cost estimator — transparent rough-range calculation.
+  // Disclaimer: provides a "starting estimate" only; final pricing requires an on-site visit.
+  const calculateEstimate = () => {
+    // Base rate per sq ft by project type
+    const baseRate: Record<typeof calcProject, number> = {
+      interior: 2.5,
+      exterior: 3.25,
+      cabinets: 9.0
+    }
+    // Quality multiplier reflecting paint grade and prep
+    const qualityMultiplier: Record<typeof calcQuality, number> = {
+      standard: 1.0,
+      premium: 1.25,
+      luxury: 1.6
+    }
+    // Small-project floor: extra rooms add minor trim/prep overhead
+    const roomAdj = 1 + Math.max(0, calcRooms - 1) * 0.04
+    const center = calcSqFt * baseRate[calcProject] * qualityMultiplier[calcQuality] * roomAdj
+    const low = Math.max(250, Math.round(center * 0.85 / 25) * 25)
+    const high = Math.max(low + 100, Math.round(center * 1.15 / 25) * 25)
+    return { low, high }
+  }
+  const estimate = calculateEstimate()
+
+  const stats = [
+    { value: '5+', label: 'Years of Experience', icon: Medal },
+    { value: '150+', label: 'Projects Completed', icon: PaintBrush },
+    { value: '100%', label: 'Satisfaction Promise', icon: Sparkle },
+    { value: '24hr', label: 'Quote Response Time', icon: Clock }
+  ]
+
+  const processSteps = [
+    {
+      icon: ChatCircleText,
+      title: 'Free Consultation',
+      desc: 'Tell us about your project online or by phone — we respond within 24 hours.'
+    },
+    {
+      icon: ClipboardText,
+      title: 'On-Site Estimate',
+      desc: 'Eddie visits your property, measures, and provides a written, transparent quote with no hidden fees.'
+    },
+    {
+      icon: Wrench,
+      title: 'Prep & Protect',
+      desc: 'Surfaces are cleaned, repaired, and primed. Floors, fixtures, and landscaping are carefully protected.'
+    },
+    {
+      icon: PaintBrush,
+      title: 'Precision Painting',
+      desc: 'Premium paints applied with expert technique for a flawless, long-lasting finish on every surface.'
+    },
+    {
+      icon: CheckCircle,
+      title: 'Final Walkthrough',
+      desc: 'We walk every inch with you to confirm perfection — backed by our 2-year workmanship warranty.'
+    }
+  ]
+
+  const colorPalettes = [
+    {
+      name: 'Coastal Calm',
+      mood: 'Serene & Airy',
+      colors: ['#E8EEF2', '#A8C3D1', '#5E8CA8', '#2F4858']
+    },
+    {
+      name: 'Modern Farmhouse',
+      mood: 'Warm & Welcoming',
+      colors: ['#F5F1EA', '#D9CFC1', '#8C7B6B', '#3A322B']
+    },
+    {
+      name: 'Bold Statement',
+      mood: 'Dramatic & Confident',
+      colors: ['#F2EFEA', '#C9B79C', '#7A2E1F', '#1B1B1B']
+    },
+    {
+      name: 'Georgia Greens',
+      mood: 'Natural & Fresh',
+      colors: ['#F2F5EE', '#BFD3B0', '#557A46', '#2B3A29']
+    },
+    {
+      name: 'Classic Neutral',
+      mood: 'Timeless & Versatile',
+      colors: ['#FFFFFF', '#EAE6DF', '#A89F92', '#4B463F']
+    },
+    {
+      name: 'Sunset Warmth',
+      mood: 'Cozy & Inviting',
+      colors: ['#FFF5EC', '#F0C6A0', '#D27D5B', '#6E2A1E']
+    }
+  ]
+
+  const faqs = [
+    {
+      q: 'How much does a typical painting project cost?',
+      a: 'Most interior rooms range from $400–$900 each, full-home interiors from $3,000–$8,000, and exterior repaints from $3,500–$10,000+ depending on size, surfaces, and paint quality. Use the calculator on this page for a starting estimate, then schedule a free on-site quote for an exact price.'
+    },
+    {
+      q: 'Are you licensed and insured?',
+      a: 'Yes — Medina Precision Painting is fully licensed, bonded, and carries $2M in liability insurance plus workers compensation, so your property and our team are always protected.'
+    },
+    {
+      q: 'How long does a painting project take?',
+      a: 'Single rooms typically take 1–2 days, full interiors 3–7 days, and exterior projects 4–10 days depending on size and weather. We confirm the timeline in writing before starting.'
+    },
+    {
+      q: 'What kind of warranty do you offer?',
+      a: 'We back every project with a 2-year workmanship warranty. If paint peels, cracks, or fails due to our application, we come back and fix it at no charge.'
+    },
+    {
+      q: 'What paint brands do you use?',
+      a: 'We work with premium brands such as Sherwin-Williams, Benjamin Moore, and Behr Premium Plus. We recommend the right product for your surface, traffic level, and budget.'
+    },
+    {
+      q: 'Do I need to move my furniture?',
+      a: 'No — we move and cover furniture, protect floors and fixtures, and restore everything when finished. You only need to remove valuables and small breakables.'
+    },
+    {
+      q: 'How do I get a quote?',
+      a: 'Click any "Get Free Quote" button or call (478) 955-2341. We typically respond within 24 hours and can usually schedule an on-site estimate within a week.'
+    },
+    {
+      q: 'What forms of payment do you accept?',
+      a: 'We accept cash, check, all major credit cards, and electronic transfers. For larger projects we offer milestone-based payment schedules.'
+    },
+    {
+      q: 'Do you offer eco-friendly or low-VOC paints?',
+      a: 'Yes — we offer low-VOC and zero-VOC paint options that are safer for kids, pets, and anyone with chemical sensitivities. Just ask when scheduling your estimate.'
+    }
+  ]
+
   const services = [
     {
       icon: House,
@@ -266,6 +498,24 @@ Make the email professional, concise, and include all relevant customer informat
       title: 'Commercial & Industrial',
       description: 'Professional painting for offices, retail, warehouses, and industrial facilities throughout Georgia.',
       features: ['Commercial properties', 'Industrial facilities', 'Large-scale projects', 'Flexible scheduling']
+    },
+    {
+      icon: Drop,
+      title: 'Pressure Washing',
+      description: 'Restore curb appeal and prep surfaces for paint with professional power washing for homes and businesses.',
+      features: ['Siding & driveways', 'Decks & patios', 'Pre-paint prep', 'Fence cleaning']
+    },
+    {
+      icon: Hammer,
+      title: 'Drywall & Repairs',
+      description: 'Patch, repair, and refinish damaged drywall, holes, and water-damaged surfaces before painting.',
+      features: ['Hole & crack repair', 'Water damage repair', 'Texture matching', 'Popcorn ceiling removal']
+    },
+    {
+      icon: Wrench,
+      title: 'Deck & Fence Staining',
+      description: 'Protect and beautify wood surfaces with quality stains and sealers built to last Georgia weather.',
+      features: ['Decks & pergolas', 'Wood fences', 'Sealing & waterproofing', 'Color & stain matching']
     },
     {
       icon: Medal,
@@ -450,6 +700,9 @@ Make the email professional, concise, and include all relevant customer informat
                           <SelectItem value="cabinets">Cabinet Refinishing</SelectItem>
                           <SelectItem value="commercial">Commercial Painting</SelectItem>
                           <SelectItem value="pressure-washing">Pressure Washing</SelectItem>
+                          <SelectItem value="drywall-repair">Drywall &amp; Repair</SelectItem>
+                          <SelectItem value="deck-fence-staining">Deck &amp; Fence Staining</SelectItem>
+                          <SelectItem value="popcorn-ceiling">Popcorn Ceiling Removal</SelectItem>
                           <SelectItem value="other">Other</SelectItem>
                         </SelectContent>
                       </Select>
@@ -478,6 +731,55 @@ Make the email professional, concise, and include all relevant customer informat
                         placeholder="Tell us about your project (optional)"
                         rows={4}
                       />
+                    </div>
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="preferred-date">Preferred Start Date</Label>
+                        <Input
+                          id="preferred-date"
+                          type="date"
+                          value={formData.preferredDate}
+                          onChange={(e) => setFormData({ ...formData, preferredDate: e.target.value })}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="budget-range">Budget Range</Label>
+                        <Select
+                          value={formData.budgetRange}
+                          onValueChange={(value) => setFormData({ ...formData, budgetRange: value })}
+                        >
+                          <SelectTrigger id="budget-range">
+                            <SelectValue placeholder="Select budget" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="under-1000">Under $1,000</SelectItem>
+                            <SelectItem value="1000-3000">$1,000 – $3,000</SelectItem>
+                            <SelectItem value="3000-7500">$3,000 – $7,500</SelectItem>
+                            <SelectItem value="7500-15000">$7,500 – $15,000</SelectItem>
+                            <SelectItem value="15000-plus">$15,000+</SelectItem>
+                            <SelectItem value="not-sure">Not sure yet</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="referral-source">How Did You Hear About Us?</Label>
+                      <Select
+                        value={formData.referralSource}
+                        onValueChange={(value) => setFormData({ ...formData, referralSource: value })}
+                      >
+                        <SelectTrigger id="referral-source">
+                          <SelectValue placeholder="Select an option" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="google">Google Search</SelectItem>
+                          <SelectItem value="facebook">Facebook</SelectItem>
+                          <SelectItem value="instagram">Instagram</SelectItem>
+                          <SelectItem value="referral">Friend / Referral</SelectItem>
+                          <SelectItem value="repeat">Repeat Customer</SelectItem>
+                          <SelectItem value="other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                     <Button type="submit" className="w-full bg-primary hover:bg-primary/90">
                       Submit Request
@@ -558,6 +860,30 @@ Make the email professional, concise, and include all relevant customer informat
                 ))}
               </div>
             </motion.div>
+          </div>
+        </section>
+
+        {/* Stats / Social Proof Counter */}
+        <section className="py-12 bg-muted/30 border-y border-border">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+              {stats.map((stat, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                  className="text-center"
+                >
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
+                    <stat.icon size={26} weight="duotone" className="text-primary" />
+                  </div>
+                  <div className="text-3xl sm:text-4xl font-bold text-primary mb-1">{stat.value}</div>
+                  <div className="text-sm text-muted-foreground">{stat.label}</div>
+                </motion.div>
+              ))}
+            </div>
           </div>
         </section>
 
@@ -985,6 +1311,300 @@ Make the email professional, concise, and include all relevant customer informat
           </div>
         </section>
 
+        {/* Our Process — 5-step trust-builder */}
+        <section id="process" className="py-20 bg-background">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-12"
+            >
+              <h2 className="text-3xl sm:text-4xl font-bold mb-4 tracking-tight" style={{ letterSpacing: '-0.01em' }}>
+                Our Process — Stress-Free, Start to Finish
+              </h2>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Five simple steps from your first call to a perfect finished space.
+              </p>
+            </motion.div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-6">
+              {processSteps.map((step, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                  className="relative"
+                >
+                  <Card className="h-full text-center">
+                    <CardHeader>
+                      <div className="relative w-14 h-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center mx-auto mb-3">
+                        <step.icon size={26} weight="duotone" />
+                        <span className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-accent text-accent-foreground text-xs font-bold flex items-center justify-center">
+                          {index + 1}
+                        </span>
+                      </div>
+                      <CardTitle className="text-lg">{step.title}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <CardDescription className="text-sm leading-relaxed">
+                        {step.desc}
+                      </CardDescription>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Paint Cost Estimator — interactive lead-generation tool */}
+        <section id="estimator" className="py-20 bg-muted/30">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-10"
+            >
+              <Badge variant="secondary" className="mb-3">Free Tool</Badge>
+              <h2 className="text-3xl sm:text-4xl font-bold mb-4 tracking-tight" style={{ letterSpacing: '-0.01em' }}>
+                Instant Paint Cost Estimator
+              </h2>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Get a ballpark price in seconds. For an exact quote, schedule a free on-site visit — we'll measure everything and confirm your price in writing.
+              </p>
+            </motion.div>
+            <Card>
+              <CardContent className="p-6 sm:p-8">
+                <div className="grid lg:grid-cols-2 gap-8">
+                  <div className="space-y-6">
+                    <div>
+                      <Label className="mb-3 block">Project Type</Label>
+                      <div className="grid grid-cols-3 gap-2">
+                        {([
+                          { value: 'interior', label: 'Interior' },
+                          { value: 'exterior', label: 'Exterior' },
+                          { value: 'cabinets', label: 'Cabinets' }
+                        ] as const).map(opt => (
+                          <Button
+                            key={opt.value}
+                            type="button"
+                            variant={calcProject === opt.value ? 'default' : 'outline'}
+                            onClick={() => setCalcProject(opt.value)}
+                            className="w-full"
+                          >
+                            {opt.label}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex items-center justify-between mb-3">
+                        <Label htmlFor="calc-sqft">Approx. Square Footage</Label>
+                        <span className="font-semibold text-primary">{calcSqFt.toLocaleString()} sq ft</span>
+                      </div>
+                      <Slider
+                        id="calc-sqft"
+                        value={[calcSqFt]}
+                        onValueChange={(v) => setCalcSqFt(v[0])}
+                        min={100}
+                        max={5000}
+                        step={50}
+                      />
+                      <p className="text-xs text-muted-foreground mt-2">
+                        Tip: average bedroom ≈ 150 sq ft, average house interior ≈ 1,500–2,500 sq ft.
+                      </p>
+                    </div>
+                    <div>
+                      <div className="flex items-center justify-between mb-3">
+                        <Label htmlFor="calc-rooms">Number of Rooms / Sections</Label>
+                        <span className="font-semibold text-primary">{calcRooms}</span>
+                      </div>
+                      <Slider
+                        id="calc-rooms"
+                        value={[calcRooms]}
+                        onValueChange={(v) => setCalcRooms(v[0])}
+                        min={1}
+                        max={15}
+                        step={1}
+                      />
+                    </div>
+                    <div>
+                      <Label className="mb-3 block">Paint Quality</Label>
+                      <div className="grid grid-cols-3 gap-2">
+                        {([
+                          { value: 'standard', label: 'Standard' },
+                          { value: 'premium', label: 'Premium' },
+                          { value: 'luxury', label: 'Luxury' }
+                        ] as const).map(opt => (
+                          <Button
+                            key={opt.value}
+                            type="button"
+                            variant={calcQuality === opt.value ? 'default' : 'outline'}
+                            onClick={() => setCalcQuality(opt.value)}
+                            className="w-full"
+                          >
+                            {opt.label}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-primary text-primary-foreground rounded-xl p-6 sm:p-8 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center gap-2 mb-2 text-primary-foreground/80">
+                        <Calculator size={20} weight="duotone" />
+                        <span className="text-sm uppercase tracking-wide">Estimated Project Cost</span>
+                      </div>
+                      <div className="text-4xl sm:text-5xl font-bold mb-2">
+                        ${estimate.low.toLocaleString()} – ${estimate.high.toLocaleString()}
+                      </div>
+                      <p className="text-sm text-primary-foreground/80 leading-relaxed mb-6">
+                        This range is a starting estimate based on industry averages for{' '}
+                        <strong>{calcQuality}</strong>-grade {calcProject} work. Final pricing depends on prep work, surface condition, and specific paint products — confirmed during your free on-site visit.
+                      </p>
+                    </div>
+                    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                      <DialogTrigger asChild>
+                        <Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground w-full">
+                          <Calendar size={20} className="mr-2" />
+                          Get My Exact Price
+                        </Button>
+                      </DialogTrigger>
+                    </Dialog>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        {/* Color Palette Inspiration */}
+        <section id="palettes" className="py-20 bg-background">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-12"
+            >
+              <h2 className="text-3xl sm:text-4xl font-bold mb-4 tracking-tight" style={{ letterSpacing: '-0.01em' }}>
+                Color Inspiration
+              </h2>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Browse curated palettes to find your style. We'll help you fine-tune the perfect shades during your free color consultation.
+              </p>
+            </motion.div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {colorPalettes.map((palette, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.05 }}
+                >
+                  <Card className="overflow-hidden hover:shadow-lg transition-all duration-300">
+                    <div className="flex h-32">
+                      {palette.colors.map((color, idx) => (
+                        <div
+                          key={idx}
+                          className="flex-1 transition-all duration-300 hover:flex-[1.5]"
+                          style={{ backgroundColor: color }}
+                          title={color}
+                          aria-label={`Color swatch ${color}`}
+                        />
+                      ))}
+                    </div>
+                    <CardContent className="p-5">
+                      <div className="flex items-start justify-between gap-3 mb-2">
+                        <h3 className="font-semibold text-lg">{palette.name}</h3>
+                        <Lightbulb size={20} weight="duotone" className="text-accent shrink-0" />
+                      </div>
+                      <p className="text-sm text-muted-foreground mb-3">{palette.mood}</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {palette.colors.map((color, idx) => (
+                          <code key={idx} className="text-xs bg-muted px-2 py-0.5 rounded">{color}</code>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Warranty & Guarantee */}
+        <section id="warranty" className="py-20 bg-muted/30">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <Card className="overflow-hidden">
+              <div className="grid md:grid-cols-[auto_1fr] gap-6 p-6 sm:p-10 items-center">
+                <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center mx-auto md:mx-0">
+                  <ShieldCheck size={56} weight="duotone" className="text-primary" />
+                </div>
+                <div className="text-center md:text-left">
+                  <Badge variant="secondary" className="mb-2">Our Promise</Badge>
+                  <h2 className="text-2xl sm:text-3xl font-bold mb-3 tracking-tight" style={{ letterSpacing: '-0.01em' }}>
+                    2-Year Workmanship Warranty &amp; 100% Satisfaction Guarantee
+                  </h2>
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    If your paint peels, cracks, or fails because of our application within two years, we'll come back and fix it free — no questions asked. And before we close out any project, we walk every inch with you to make sure you're 100% satisfied.
+                  </p>
+                  <div className="flex flex-wrap gap-2 justify-center md:justify-start">
+                    <Badge variant="outline">Written Warranty</Badge>
+                    <Badge variant="outline">Free Touch-Ups</Badge>
+                    <Badge variant="outline">Licensed &amp; Insured</Badge>
+                    <Badge variant="outline">Final Walkthrough</Badge>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section id="faq" className="py-20 bg-background">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-10"
+            >
+              <h2 className="text-3xl sm:text-4xl font-bold mb-4 tracking-tight" style={{ letterSpacing: '-0.01em' }}>
+                Frequently Asked Questions
+              </h2>
+              <p className="text-lg text-muted-foreground">
+                Everything you need to know before scheduling your project.
+              </p>
+            </motion.div>
+            <Accordion type="single" collapsible className="w-full">
+              {faqs.map((faq, index) => (
+                <AccordionItem key={index} value={`faq-${index}`}>
+                  <AccordionTrigger className="text-left text-base sm:text-lg font-semibold">
+                    {faq.q}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-muted-foreground leading-relaxed">
+                    {faq.a}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+            <div className="text-center mt-8">
+              <p className="text-muted-foreground mb-3">Don't see your question?</p>
+              <a href="tel:4789552341">
+                <Button variant="outline">
+                  <Phone size={18} className="mr-2" />
+                  Call (478) 955-2341
+                </Button>
+              </a>
+            </div>
+          </div>
+        </section>
+
         <section className="py-16 bg-muted/30">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
@@ -1061,7 +1681,7 @@ Make the email professional, concise, and include all relevant customer informat
                 We're here to answer your questions and discuss your painting project.
               </p>
             </motion.div>
-            <div className="grid sm:grid-cols-3 gap-8 max-w-4xl mx-auto">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-5xl mx-auto">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -1088,7 +1708,7 @@ Make the email professional, concise, and include all relevant customer informat
                   <EnvelopeSimple size={28} weight="duotone" className="text-primary" />
                 </div>
                 <h3 className="font-semibold mb-2">Email</h3>
-                <a href="mailto:info@medinaprecisionpainting.com" className="text-muted-foreground hover:text-primary transition-colors">
+                <a href="mailto:info@medinaprecisionpainting.com" className="text-muted-foreground hover:text-primary transition-colors break-all">
                   info@medinaprecisionpainting.com
                 </a>
               </motion.div>
@@ -1104,7 +1724,24 @@ Make the email professional, concise, and include all relevant customer informat
                 </div>
                 <h3 className="font-semibold mb-2">Service Area</h3>
                 <p className="text-muted-foreground">
-                  Warner Robins<br />& All of Georgia
+                  Warner Robins<br />&amp; All of Georgia
+                </p>
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.4 }}
+                className="text-center"
+              >
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                  <Clock size={28} weight="duotone" className="text-primary" />
+                </div>
+                <h3 className="font-semibold mb-2">Business Hours</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  Mon–Fri: 7:00am – 6:00pm<br />
+                  Saturday: 8:00am – 4:00pm<br />
+                  Sunday: By appointment
                 </p>
               </motion.div>
             </div>
@@ -1119,10 +1756,42 @@ Make the email professional, concise, and include all relevant customer informat
               Quote Requests Management
             </DialogTitle>
             <DialogDescription>
-              View and manage all quote requests. Total: {(quotes || []).length} quotes
+              View and manage all quote requests. Total: {(quotes || []).length} quotes • Newsletter subscribers: {(subscribers || []).length}
             </DialogDescription>
           </DialogHeader>
-          
+
+          {/* Owner dashboard stats */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {(['new', 'contacted', 'quoted', 'completed'] as const).map(s => (
+              <div key={s} className="rounded-lg border border-border p-3 text-center">
+                <div className="text-2xl font-bold text-primary">{getQuotesByStatus(s).length}</div>
+                <div className="text-xs uppercase tracking-wide text-muted-foreground">{s}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Owner tools: search + CSV export */}
+          <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
+            <div className="relative flex-1">
+              <MagnifyingGlass size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Search by name, email, phone, address, service..."
+                value={quoteSearch}
+                onChange={(e) => setQuoteSearch(e.target.value)}
+                className="pl-9"
+                aria-label="Search quotes"
+              />
+            </div>
+            <Button
+              variant="outline"
+              onClick={exportQuotesCSV}
+              className="flex items-center gap-2 shrink-0"
+            >
+              <Download size={16} />
+              Export CSV
+            </Button>
+          </div>
+
           <Tabs defaultValue="new" className="flex-1 overflow-hidden flex flex-col">
             <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="new" className="relative">
@@ -1159,15 +1828,17 @@ Make the email professional, concise, and include all relevant customer informat
               </TabsTrigger>
             </TabsList>
 
-            {(['new', 'contacted', 'quoted', 'completed'] as const).map((status) => (
+            {(['new', 'contacted', 'quoted', 'completed'] as const).map((status) => {
+              const filtered = filterBySearch(getQuotesByStatus(status))
+              return (
               <TabsContent key={status} value={status} className="flex-1 overflow-y-auto mt-4 space-y-4">
-                {getQuotesByStatus(status).length === 0 ? (
+                {filtered.length === 0 ? (
                   <div className="text-center py-12 text-muted-foreground">
                     <ClipboardText size={48} className="mx-auto mb-4 opacity-20" />
-                    <p>No {status} quotes</p>
+                    <p>{quoteSearch ? `No matching ${status} quotes` : `No ${status} quotes`}</p>
                   </div>
                 ) : (
-                  getQuotesByStatus(status).map((quote) => (
+                  filtered.map((quote) => (
                     <Card key={quote.id} className="hover:shadow-md transition-shadow">
                       <CardHeader>
                         <div className="flex items-start justify-between">
@@ -1279,7 +1950,7 @@ Make the email professional, concise, and include all relevant customer informat
                   ))
                 )}
               </TabsContent>
-            ))}
+            )})}
           </Tabs>
         </DialogContent>
       </Dialog>
@@ -1375,16 +2046,108 @@ Make the email professional, concise, and include all relevant customer informat
           )}
         </DialogContent>
       </Dialog>
-      <footer className="bg-foreground text-background py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+      <footer className="bg-foreground text-background">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
             <div>
-              <img src={logoImage} alt="Medina Precision Painting" className="h-16 w-auto brightness-0 invert" />
+              <img src={logoImage} alt="Medina Precision Painting" className="h-16 w-auto brightness-0 invert mb-4" />
+              <p className="text-sm opacity-80 leading-relaxed mb-4">
+                Family-owned painting contractor serving Warner Robins and all of Georgia. Licensed, insured, and backed by a 2-year warranty.
+              </p>
+              <div className="flex gap-3">
+                <a
+                  href="https://www.facebook.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Facebook"
+                  className="w-9 h-9 rounded-full bg-background/10 hover:bg-accent flex items-center justify-center transition-colors"
+                >
+                  <FacebookLogo size={18} weight="fill" />
+                </a>
+                <a
+                  href="https://www.instagram.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram"
+                  className="w-9 h-9 rounded-full bg-background/10 hover:bg-accent flex items-center justify-center transition-colors"
+                >
+                  <InstagramLogo size={18} weight="fill" />
+                </a>
+                <a
+                  href="https://www.google.com/search?q=Medina+Precision+Painting"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Google Business"
+                  className="w-9 h-9 rounded-full bg-background/10 hover:bg-accent flex items-center justify-center transition-colors"
+                >
+                  <GoogleLogo size={18} weight="fill" />
+                </a>
+              </div>
             </div>
-            <div className="text-center md:text-right text-sm opacity-80">
-              <p>© 2024 Medina Precision Painting. All rights reserved.</p>
-              <p className="mt-1">Licensed, Bonded & Insured • Family-Owned & Operated</p>
+
+            <div>
+              <h4 className="font-semibold mb-4">Quick Links</h4>
+              <ul className="space-y-2 text-sm opacity-80">
+                <li><a href="#process" className="hover:opacity-100 hover:text-accent transition-colors">Our Process</a></li>
+                <li><a href="#estimator" className="hover:opacity-100 hover:text-accent transition-colors">Cost Estimator</a></li>
+                <li><a href="#palettes" className="hover:opacity-100 hover:text-accent transition-colors">Color Inspiration</a></li>
+                <li><a href="#warranty" className="hover:opacity-100 hover:text-accent transition-colors">Warranty</a></li>
+                <li><a href="#faq" className="hover:opacity-100 hover:text-accent transition-colors">FAQ</a></li>
+              </ul>
             </div>
+
+            <div>
+              <h4 className="font-semibold mb-4">Contact</h4>
+              <ul className="space-y-2 text-sm opacity-80">
+                <li className="flex items-start gap-2">
+                  <Phone size={16} weight="bold" className="mt-0.5 shrink-0" />
+                  <a href="tel:4789552341" className="hover:opacity-100 hover:text-accent transition-colors">(478) 955-2341</a>
+                </li>
+                <li className="flex items-start gap-2">
+                  <EnvelopeSimple size={16} weight="bold" className="mt-0.5 shrink-0" />
+                  <a href="mailto:info@medinaprecisionpainting.com" className="hover:opacity-100 hover:text-accent transition-colors break-all">info@medinaprecisionpainting.com</a>
+                </li>
+                <li className="flex items-start gap-2">
+                  <MapPin size={16} weight="bold" className="mt-0.5 shrink-0" />
+                  <span>Warner Robins, GA<br />Serving all of Georgia</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Clock size={16} weight="bold" className="mt-0.5 shrink-0" />
+                  <span>Mon–Fri 7am–6pm<br />Sat 8am–4pm</span>
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-semibold mb-4">Painting Tips Newsletter</h4>
+              <p className="text-sm opacity-80 mb-3">
+                Get color tips, maintenance advice, and seasonal offers — no spam.
+              </p>
+              <form onSubmit={handleNewsletterSubmit} className="flex flex-col gap-2">
+                <Input
+                  type="email"
+                  required
+                  value={newsletterEmail}
+                  onChange={(e) => setNewsletterEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  className="bg-background/10 border-background/20 text-background placeholder:text-background/50"
+                  aria-label="Email address"
+                />
+                <Button type="submit" className="bg-accent hover:bg-accent/90 text-accent-foreground w-full">
+                  <PaperPlaneTilt size={16} className="mr-2" />
+                  Subscribe
+                </Button>
+              </form>
+              <div className="mt-4 flex flex-wrap items-center gap-2 text-xs opacity-70">
+                <CreditCard size={16} weight="duotone" />
+                <span>We accept: Cash, Check, Visa, Mastercard, Amex</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t border-background/20 pt-6 flex flex-col md:flex-row justify-between items-center gap-3 text-sm opacity-80">
+            <p>© {new Date().getFullYear()} Medina Precision Painting. All rights reserved.</p>
+            <p>Licensed, Bonded &amp; Insured • Family-Owned &amp; Operated • EPA Lead-Safe Practices</p>
           </div>
         </div>
       </footer>
