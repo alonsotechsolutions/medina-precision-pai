@@ -196,38 +196,38 @@ Make the email professional, concise, and include all relevant customer informat
     {
       icon: House,
       title: 'Interior Painting',
-      description: 'Transform your living spaces with expert interior painting that brings new life to every room.',
-      features: ['Wall & ceiling painting', 'Trim & door refinishing', 'Color consultation', 'Smooth, flawless finish']
+      description: 'Transform your living spaces with expert interior painting. Perfect finish on drywall, wood, and more.',
+      features: ['Wall & ceiling painting', 'Trim & door refinishing', 'Drywall finishing', 'Multiple surface types']
     },
     {
       icon: Palette,
       title: 'Exterior Painting',
-      description: 'Protect and beautify your home\'s exterior with durable, weather-resistant paint solutions.',
-      features: ['House painting', 'Deck & fence staining', 'Power washing', 'Surface preparation']
+      description: 'Protect and beautify your home with durable paint. Expert application on siding, wood, metal, and masonry.',
+      features: ['House painting', 'Siding & masonry', 'Metal surfaces', 'Weather-resistant finishes']
     },
     {
       icon: PaintBrush,
       title: 'Cabinet Refinishing',
       description: 'Modernize your kitchen or bathroom with professional cabinet painting and refinishing services.',
-      features: ['Kitchen cabinets', 'Bathroom vanities', 'Built-in furniture', 'Custom color matching']
+      features: ['Kitchen cabinets', 'Bathroom vanities', 'Custom color matching', 'Smooth cabinet finish']
     },
     {
       icon: Sparkle,
-      title: 'Pressure Washing',
-      description: 'Restore your property\'s appearance with thorough pressure washing services.',
-      features: ['House washing', 'Driveway cleaning', 'Deck restoration', 'Pre-paint preparation']
+      title: 'High-End Residential',
+      description: 'Premium painting services for luxury homes with meticulous attention to detail and flawless results.',
+      features: ['Luxury finishes', 'Premium materials', 'Detailed craftsmanship', 'High-end properties']
     },
     {
       icon: ShieldCheck,
-      title: 'Commercial Painting',
-      description: 'Professional painting services for offices, retail spaces, and commercial properties.',
-      features: ['Minimal disruption', 'Flexible scheduling', 'Large-scale projects', 'Quality materials']
+      title: 'Commercial & Industrial',
+      description: 'Professional painting for offices, retail, warehouses, and industrial facilities throughout Georgia.',
+      features: ['Commercial properties', 'Industrial facilities', 'Large-scale projects', 'Flexible scheduling']
     },
     {
       icon: Medal,
-      title: 'Specialty Finishes',
-      description: 'Unique textures, patterns, and custom finishes to make your space truly distinctive.',
-      features: ['Decorative painting', 'Accent walls', 'Textured finishes', 'Custom designs']
+      title: 'Surface Expertise',
+      description: 'Expert knowledge of paints and primers for any surface. Perfect product selection for your project.',
+      features: ['Paint selection guidance', 'Primer expertise', 'Surface-specific solutions', 'Quality materials']
     }
   ]
 
@@ -236,19 +236,19 @@ Make the email professional, concise, and include all relevant customer informat
       name: 'Jennifer Martinez',
       location: 'Warner Robins, GA',
       rating: 5,
-      text: 'Medina Precision Painting did an amazing job on our home. Professional, punctual, and the quality is outstanding. Highly recommend!'
+      text: 'Eddie did an amazing job on our home. Professional, punctual, and the quality is outstanding. He really knows his craft. Highly recommend!'
     },
     {
       name: 'David Thompson',
-      location: 'Macon, GA',
+      location: 'Atlanta, GA',
       rating: 5,
-      text: 'Best painting company in Central Georgia! They transformed our office space and stayed on budget. Will definitely use them again.'
+      text: 'Best painting contractor in Georgia! Eddie transformed our office space and stayed on budget. His expertise with different surfaces is impressive.'
     },
     {
       name: 'Sarah Williams',
-      location: 'Perry, GA',
+      location: 'Macon, GA',
       rating: 5,
-      text: 'From the free estimate to the final walkthrough, everything was handled with care and professionalism. Our house looks brand new!'
+      text: 'From the free estimate to the final walkthrough, everything was handled with care and professionalism. Eddie selected the perfect paint for our project!'
     }
   ]
 
@@ -286,8 +286,8 @@ Make the email professional, concise, and include all relevant customer informat
   ]
 
   const serviceAreas = [
-    'Warner Robins', 'Macon', 'Perry', 'Centerville', 'Byron', 'Fort Valley',
-    'Bonaire', 'Kathleen', 'Hawkinsville', 'Eastman', 'Dublin', 'Milledgeville'
+    'Warner Robins', 'Macon', 'Perry', 'Atlanta', 'Augusta', 'Columbus',
+    'Savannah', 'Athens', 'Albany', 'Valdosta', 'Rome', 'Gainesville'
   ]
 
   const containerVariants = {
@@ -315,9 +315,9 @@ Make the email professional, concise, and include all relevant customer informat
     <div className="min-h-screen bg-background">
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
+          <div className="flex items-center justify-between h-24">
             <div className="flex items-center">
-              <img src={logoImage} alt="Medina Precision Painting" className="h-14 w-auto" />
+              <img src={logoImage} alt="Medina Precision Painting" className="h-20 w-auto" />
             </div>
             <div className="flex items-center gap-4">
               {isOwner && (
@@ -463,7 +463,7 @@ Make the email professional, concise, and include all relevant customer informat
         </motion.div>
       )}
 
-      <main className="pt-20">
+      <main className="pt-24">
         <section className="relative py-24 sm:py-32 bg-gradient-to-br from-primary via-secondary to-accent overflow-hidden">
           <div className="absolute inset-0 opacity-10" style={{
             backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 35px, currentColor 35px, currentColor 36px)`
@@ -479,7 +479,7 @@ Make the email professional, concise, and include all relevant customer informat
                 Transform Your Space with<br />Precision & Care
               </h1>
               <p className="text-lg sm:text-xl mb-8 text-primary-foreground/90 max-w-3xl mx-auto">
-                Family-owned painting business serving Warner Robins and Central Georgia since 2006. Professional craftsmanship, honest pricing, and outstanding results guaranteed.
+                Family-owned painting business serving Warner Robins and Central Georgia. Professional craftsmanship by Eddie Medina with 5 years of expertise across commercial, residential, and industrial projects. Honest pricing and outstanding results guaranteed.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -500,7 +500,7 @@ Make the email professional, concise, and include all relevant customer informat
               <div className="mt-12 flex flex-wrap justify-center gap-6 text-sm">
                 {[
                   { icon: ShieldCheck, text: 'Fully Licensed & Insured' },
-                  { icon: Medal, text: '18+ Years Experience' },
+                  { icon: Medal, text: '5 Years Experience' },
                   { icon: Sparkle, text: '2-Year Warranty' }
                 ].map((benefit, index) => (
                   <motion.div
@@ -531,7 +531,7 @@ Make the email professional, concise, and include all relevant customer informat
                 Complete Painting Solutions
               </h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                From residential homes to commercial properties, we deliver exceptional painting services tailored to your needs.
+                From high-end homes to commercial and industrial facilities, Eddie delivers exceptional painting services with expert knowledge of surfaces, paints, and primers.
               </p>
             </motion.div>
             <motion.div
@@ -622,7 +622,7 @@ Make the email professional, concise, and include all relevant customer informat
                 What Our Customers Say
               </h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Don't just take our word for it. Here's what Central Georgia homeowners and businesses say about working with us.
+                Don't just take our word for it. Here's what Georgia homeowners and businesses say about working with Eddie.
               </p>
             </motion.div>
             <div className="grid md:grid-cols-3 gap-6">
@@ -676,12 +676,12 @@ Make the email professional, concise, and include all relevant customer informat
             </motion.div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto mb-12">
               {[
-                { icon: Medal, title: 'Professional Business', desc: 'Trusted painting business serving Central Georgia with pride' },
-                { icon: Users, title: 'Expert Craftsmen', desc: 'Trained, background-checked professionals on every crew' },
+                { icon: Medal, title: '5 Years Experience', desc: 'Proven expertise across commercial, residential, and industrial projects' },
+                { icon: Users, title: 'Expert Craftsmanship', desc: 'Meticulous attention to detail on every surface type' },
                 { icon: ShieldCheck, title: 'Fully Insured', desc: '$2M liability coverage and workers compensation' },
-                { icon: CurrencyDollar, title: 'Upfront Pricing', desc: 'Detailed estimates with no hidden fees or surprises' },
-                { icon: Sparkle, title: '2-Year Warranty', desc: 'All labor and materials backed by our guarantee' },
-                { icon: Calendar, title: 'Flexible Scheduling', desc: 'Work around your schedule with minimal disruption' }
+                { icon: CurrencyDollar, title: 'Honest Pricing', desc: 'Detailed estimates with no hidden fees or surprises' },
+                { icon: Sparkle, title: 'Quality Materials', desc: 'Expert selection of the perfect paints and primers for your project' },
+                { icon: Calendar, title: 'Flexible Service', desc: 'Serving all of Georgia with professional painting solutions' }
               ].map((item, index) => (
                 <motion.div
                   key={index}
@@ -708,12 +708,12 @@ Make the email professional, concise, and include all relevant customer informat
               className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto"
             >
               {[
-                'Premium Sherwin-Williams and Benjamin Moore paints',
-                'Thorough surface preparation and priming',
-                'Protection of furniture and flooring',
-                'Daily cleanup and job site maintenance',
-                'Color matching and consultation services',
-                'Lead-safe certified for older homes'
+                'Expert on drywall, wood, siding, metal, masonry, and cabinets',
+                'Comprehensive knowledge of paints and primers',
+                'Perfect product selection for each project',
+                'High-end residential painting experience',
+                'Commercial and industrial project expertise',
+                'Professional service throughout Georgia'
               ].map((item, index) => (
                 <motion.div
                   key={index}
@@ -743,16 +743,16 @@ Make the email professional, concise, and include all relevant customer informat
                   About Medina Precision Painting
                 </h2>
                 <p className="text-lg text-muted-foreground mb-4 leading-relaxed">
-                  Medina Precision Painting is a trusted painting business serving homeowners and businesses throughout Warner Robins and Central Georgia. We bring generations of painting expertise and a commitment to precision in every project.
+                  Led by Eddie Medina, Medina Precision Painting brings 5 years of professional painting expertise to homeowners and businesses throughout Georgia. Eddie has successfully completed commercial, residential, and industrial projects, including high-end luxury homes across the state.
                 </p>
                 <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
-                  We take pride in every project, treating your property with the same care and attention we'd give our own homes. From meticulous surface preparation to the final coat, we ensure every detail meets our high standards and exceeds your expectations.
+                  With expert knowledge of multiple surface types—including drywall, wood, siding, metal, masonry, and cabinets—Eddie ensures a flawless finish every time. His comprehensive understanding of paints and primers allows him to select the perfect products for each unique project, guaranteeing lasting results that exceed expectations.
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  <Badge variant="secondary">EPA Lead-Safe Certified</Badge>
-                  <Badge variant="secondary">Fully Licensed & Bonded</Badge>
+                  <Badge variant="secondary">5 Years Experience</Badge>
+                  <Badge variant="secondary">Fully Licensed & Insured</Badge>
                   <Badge variant="secondary">$2M Liability Insurance</Badge>
-                  <Badge variant="secondary">BBB Accredited</Badge>
+                  <Badge variant="secondary">Multi-Surface Expert</Badge>
                 </div>
               </motion.div>
               <motion.div
@@ -778,10 +778,10 @@ Make the email professional, concise, and include all relevant customer informat
               className="text-center mb-8"
             >
               <h2 className="text-2xl sm:text-3xl font-bold mb-4">
-                Serving Warner Robins & Central Georgia
+                Serving All of Georgia
               </h2>
               <p className="text-muted-foreground mb-6">
-                Proudly providing professional painting services to the following communities within 1.5 hours of Warner Robins
+                Proudly providing professional painting services throughout Georgia, with a home base in Warner Robins
               </p>
             </motion.div>
             <div className="flex flex-wrap justify-center gap-3 max-w-4xl mx-auto">
@@ -888,7 +888,7 @@ Make the email professional, concise, and include all relevant customer informat
                 </div>
                 <h3 className="font-semibold mb-2">Service Area</h3>
                 <p className="text-muted-foreground">
-                  Warner Robins<br />& Central Georgia
+                  Warner Robins<br />& All of Georgia
                 </p>
               </motion.div>
             </div>
@@ -1166,7 +1166,7 @@ Make the email professional, concise, and include all relevant customer informat
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div>
-              <img src={logoImage} alt="Medina Precision Painting" className="h-12 w-auto brightness-0 invert" />
+              <img src={logoImage} alt="Medina Precision Painting" className="h-16 w-auto brightness-0 invert" />
             </div>
             <div className="text-center md:text-right text-sm opacity-80">
               <p>© 2024 Medina Precision Painting. All rights reserved.</p>
