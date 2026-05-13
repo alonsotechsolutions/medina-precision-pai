@@ -1,4 +1,11 @@
 import { useState, useEffect, useCallback } from 'react'
+import { Routes, Route, Link, useLocation } from 'react-router-dom'
+import Home from './pages/Home'
+import Services from './pages/Services'
+import Gallery from './pages/Gallery'
+import Testimonials from './pages/Testimonials'
+import About from './pages/About'
+import Contact from './pages/Contact'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -608,6 +615,7 @@ Make the email professional, concise, and include all relevant customer informat
     }
   }
 
+  const location = useLocation();
   return (
     <div className="min-h-screen bg-background">
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border">
@@ -617,24 +625,12 @@ Make the email professional, concise, and include all relevant customer informat
               <img src={logoImage} alt="Medina Precision Painting" className="h-20 w-auto" />
             </div>
             <nav className="hidden md:flex gap-2 ml-8">
-              {[
-                { label: 'Services', href: '#services' },
-                { label: 'Gallery', href: '#gallery' },
-                { label: 'Testimonials', href: '#testimonials' },
-                { label: 'About', href: '#about' },
-                { label: 'Process', href: '#process' },
-                { label: 'Estimator', href: '#estimator' },
-                { label: 'Contact', href: '#contact' }
-              ].map(tab => (
-                <a
-                  key={tab.href}
-                  href={tab.href}
-                  className="px-4 py-2 rounded-md text-sm font-medium text-muted-foreground hover:text-primary hover:bg-accent/30 transition-colors"
-                  style={{ scrollBehavior: 'smooth' }}
-                >
-                  {tab.label}
-                </a>
-              ))}
+              <Link to="/" className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${location.pathname === '/' ? 'text-primary bg-accent/30' : 'text-muted-foreground hover:text-primary hover:bg-accent/30'}`}>Home</Link>
+              <Link to="/services" className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${location.pathname === '/services' ? 'text-primary bg-accent/30' : 'text-muted-foreground hover:text-primary hover:bg-accent/30'}`}>Services</Link>
+              <Link to="/gallery" className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${location.pathname === '/gallery' ? 'text-primary bg-accent/30' : 'text-muted-foreground hover:text-primary hover:bg-accent/30'}`}>Gallery</Link>
+              <Link to="/testimonials" className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${location.pathname === '/testimonials' ? 'text-primary bg-accent/30' : 'text-muted-foreground hover:text-primary hover:bg-accent/30'}`}>Testimonials</Link>
+              <Link to="/about" className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${location.pathname === '/about' ? 'text-primary bg-accent/30' : 'text-muted-foreground hover:text-primary hover:bg-accent/30'}`}>About</Link>
+              <Link to="/contact" className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${location.pathname === '/contact' ? 'text-primary bg-accent/30' : 'text-muted-foreground hover:text-primary hover:bg-accent/30'}`}>Contact</Link>
             </nav>
             <div className="flex items-center gap-4">
               {isOwner && (
@@ -673,24 +669,12 @@ Make the email professional, concise, and include all relevant customer informat
         </div>
         {/* Mobile tab bar */}
         <nav className="md:hidden flex justify-center gap-1 border-t border-border bg-background/95 backdrop-blur-md sticky top-[96px] z-40">
-          {[
-            { label: 'Services', href: '#services' },
-            { label: 'Gallery', href: '#gallery' },
-            { label: 'Testimonials', href: '#testimonials' },
-            { label: 'About', href: '#about' },
-            { label: 'Process', href: '#process' },
-            { label: 'Estimator', href: '#estimator' },
-            { label: 'Contact', href: '#contact' }
-          ].map(tab => (
-            <a
-              key={tab.href}
-              href={tab.href}
-              className="px-2 py-2 text-xs font-medium text-muted-foreground hover:text-primary"
-              style={{ scrollBehavior: 'smooth' }}
-            >
-              {tab.label}
-            </a>
-          ))}
+          <Link to="/" className={`px-2 py-2 text-xs font-medium ${location.pathname === '/' ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`}>Home</Link>
+          <Link to="/services" className={`px-2 py-2 text-xs font-medium ${location.pathname === '/services' ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`}>Services</Link>
+          <Link to="/gallery" className={`px-2 py-2 text-xs font-medium ${location.pathname === '/gallery' ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`}>Gallery</Link>
+          <Link to="/testimonials" className={`px-2 py-2 text-xs font-medium ${location.pathname === '/testimonials' ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`}>Testimonials</Link>
+          <Link to="/about" className={`px-2 py-2 text-xs font-medium ${location.pathname === '/about' ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`}>About</Link>
+          <Link to="/contact" className={`px-2 py-2 text-xs font-medium ${location.pathname === '/contact' ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`}>Contact</Link>
         </nav>
       </header>
       {showFloatingCTA && (
@@ -789,63 +773,16 @@ Make the email professional, concise, and include all relevant customer informat
           </div>
         </section>
 
-        <section className="py-20 bg-background">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-center mb-12"
-            >
-              <h2 className="text-3xl sm:text-4xl font-bold mb-4 tracking-tight" style={{ letterSpacing: '-0.01em' }}>
-                Complete Painting Solutions
-              </h2>
-              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                From high-end homes to commercial and industrial facilities, Eddie delivers exceptional painting services with expert knowledge of surfaces, paints, and primers.
-              </p>
-            </motion.div>
-            {isMobile ? (
-              <div className="relative">
-                <div className="overflow-hidden" ref={servicesEmblaRef}>
-                  <div className="flex">
-                    {services.map((service, index) => (
-                      <div key={index} className="flex-[0_0_100%] min-w-0">
-                        <Card className="h-full transition-all duration-300 border-border mx-2">
-                          <CardHeader>
-                            <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                              <service.icon size={28} weight="duotone" className="text-primary" />
-                            </div>
-                            <CardTitle className="text-xl">{service.title}</CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                            <CardDescription className="text-base leading-relaxed mb-4">
-                              {service.description}
-                            </CardDescription>
-                            <ul className="space-y-2">
-                              {service.features.map((feature, idx) => (
-                                <li key={idx} className="flex items-center gap-2 text-sm text-muted-foreground">
-                                  <CheckCircle size={16} weight="fill" className="text-primary shrink-0" />
-                                  {feature}
-                                </li>
-                              ))}
-                            </ul>
-                          </CardContent>
-                        </Card>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div className="flex items-center justify-center gap-4 mt-6">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={scrollServicesPrev}
-                    className="rounded-full"
-                  >
-                    <CaretLeft size={20} weight="bold" />
-                  </Button>
-                  <div className="flex gap-1.5">
-                    {services.map((_, index) => (
+        <main className="pt-24 text-lg">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/services" element={<Services />} />
+            <Route path="/gallery" element={<Gallery />} />
+            <Route path="/testimonials" element={<Testimonials />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
+          </Routes>
+        </main>
                       <div
                         key={index}
                         className={`h-2 rounded-full transition-all duration-300 ${
