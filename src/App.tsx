@@ -340,11 +340,14 @@ Make the email professional, concise, and include all relevant customer informat
   // Paint cost estimator — transparent rough-range calculation.
   // Disclaimer: provides a "starting estimate" only; final pricing requires an on-site visit.
   const calculateEstimate = () => {
-    // Base rate per sq ft by project type
+    // Base rate in USD per square foot of paintable area, based on 2024 Central-Georgia
+    // market averages for labor + standard materials. Update annually as paint and labor
+    // costs change. Cabinets are higher because they require disassembly, sanding,
+    // priming, and multiple spray coats.
     const baseRate: Record<typeof calcProject, number> = {
-      interior: 2.5,
-      exterior: 3.25,
-      cabinets: 9.0
+      interior: 2.5,  // $/sq ft
+      exterior: 3.25, // $/sq ft
+      cabinets: 9.0   // $/sq ft (door + frame surface)
     }
     // Quality multiplier reflecting paint grade and prep
     const qualityMultiplier: Record<typeof calcQuality, number> = {
