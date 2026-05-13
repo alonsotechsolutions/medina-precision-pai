@@ -445,7 +445,6 @@ Make the email professional, concise, and include all relevant customer informat
           </div>
         </div>
       </header>
-
       {showFloatingCTA && (
         <motion.div
           initial={{ opacity: 0, y: 100 }}
@@ -462,8 +461,7 @@ Make the email professional, concise, and include all relevant customer informat
           </Dialog>
         </motion.div>
       )}
-
-      <main className="pt-24">
+      <main className="pt-24 text-lg">
         <section className="relative py-24 sm:py-32 bg-gradient-to-br from-primary via-secondary to-accent overflow-hidden">
           <div className="absolute inset-0 opacity-10" style={{
             backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 35px, currentColor 35px, currentColor 36px)`
@@ -895,7 +893,6 @@ Make the email professional, concise, and include all relevant customer informat
           </div>
         </section>
       </main>
-
       <Dialog open={showAdminPanel} onOpenChange={setShowAdminPanel}>
         <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden flex flex-col">
           <DialogHeader>
@@ -1068,7 +1065,6 @@ Make the email professional, concise, and include all relevant customer informat
           </Tabs>
         </DialogContent>
       </Dialog>
-
       <Dialog open={selectedQuote !== null} onOpenChange={() => setSelectedQuote(null)}>
         <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
           {selectedQuote && (
@@ -1161,7 +1157,6 @@ Make the email professional, concise, and include all relevant customer informat
           )}
         </DialogContent>
       </Dialog>
-
       <footer className="bg-foreground text-background py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
@@ -1176,7 +1171,7 @@ Make the email professional, concise, and include all relevant customer informat
         </div>
       </footer>
     </div>
-  )
+  );
 }
 
 export default App
