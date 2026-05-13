@@ -684,10 +684,10 @@ Make the email professional, concise, and include all relevant customer informat
                 Don't just take our word for it. Here's what Georgia homeowners and businesses say about working with Eddie.
               </p>
             </motion.div>
-            <div className="grid md:grid-cols-3 gap-6">
-              {testimonials.map((testimonial, index) => (
-                <motion.div
-                  key={index}
+            {isMobile ? (
+              <div className="overflow-hidden" ref={testimonialsEmblaRef}>
+                <div className="flex gap-4">
+                  {testimonials.map((testimonial, index) => (
                     <div key={index} className="flex-[0_0_85%] min-w-0">
                       <Card className="h-full">
                         <CardHeader>
