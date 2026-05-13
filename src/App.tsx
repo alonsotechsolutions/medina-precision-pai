@@ -32,6 +32,8 @@ import {
 import { toast } from 'sonner'
 import { motion } from 'framer-motion'
 import { useKV } from '@github/spark/hooks'
+import { useIsMobile } from '@/hooks/use-mobile'
+import useEmblaCarousel from 'embla-carousel-react'
 import logoImage from '@/assets/images/Logo.png'
 
 interface QuoteRequest {
@@ -62,8 +64,13 @@ function App() {
   const [isOwner, setIsOwner] = useState(false)
   const [showAdminPanel, setShowAdminPanel] = useState(false)
   const [selectedQuote, setSelectedQuote] = useState<QuoteRequest | null>(null)
+  const isMobile = useIsMobile()
   
   const [quotes, setQuotes] = useKV<QuoteRequest[]>('quote-requests', [])
+  
+  const [servicesEmblaRef] = useEmblaCarousel({ loop: false, align: 'start' })
+  const [galleryEmblaRef] = useEmblaCarousel({ loop: false, align: 'start' })
+  const [testimonialsEmblaRef] = useEmblaCarousel({ loop: false, align: 'start' })
 
   useEffect(() => {
     const handleScroll = () => {
@@ -532,39 +539,71 @@ Make the email professional, concise, and include all relevant customer informat
                 From high-end homes to commercial and industrial facilities, Eddie delivers exceptional painting services with expert knowledge of surfaces, paints, and primers.
               </p>
             </motion.div>
-            <motion.div
-              variants={containerVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
-            >
-              {services.map((service, index) => (
-                <motion.div key={index} variants={itemVariants}>
-                  <Card className="h-full transition-all duration-300 hover:shadow-lg hover:scale-[1.02] border-border">
-                    <CardHeader>
-                      <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                        <service.icon size={28} weight="duotone" className="text-primary" />
-                      </div>
-                      <CardTitle className="text-xl">{service.title}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <CardDescription className="text-base leading-relaxed mb-4">
-                        {service.description}
-                      </CardDescription>
-                      <ul className="space-y-2">
-                        {service.features.map((feature, idx) => (
-                          <li key={idx} className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <CheckCircle size={16} weight="fill" className="text-primary shrink-0" />
-                            {feature}
-                          </li>
-                        ))}
-                      </ul>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))}
-            </motion.div>
+            {isMobile ? (
+              <div className="overflow-hidden" ref={servicesEmblaRef}>
+                <div className="flex gap-4">
+                  {services.map((service, index) => (
+                    <div key={index} className="flex-[0_0_85%] min-w-0">
+                      <Card className="h-full transition-all duration-300 border-border">
+                        <CardHeader>
+                          <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                            <service.icon size={28} weight="duotone" className="text-primary" />
+                          </div>
+                          <CardTitle className="text-xl">{service.title}</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <CardDescription className="text-base leading-relaxed mb-4">
+                            {service.description}
+                          </CardDescription>
+                          <ul className="space-y-2">
+                            {service.features.map((feature, idx) => (
+                              <li key={idx} className="flex items-center gap-2 text-sm text-muted-foreground">
+                                <CheckCircle size={16} weight="fill" className="text-primary shrink-0" />
+                                {feature}
+                              </li>
+                            ))}
+                          </ul>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <motion.div
+                variants={containerVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
+              >
+                {services.map((service, index) => (
+                  <motion.div key={index} variants={itemVariants}>
+                    <Card className="h-full transition-all duration-300 hover:shadow-lg hover:scale-[1.02] border-border">
+                      <CardHeader>
+                        <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                          <service.icon size={28} weight="duotone" className="text-primary" />
+                        </div>
+                        <CardTitle className="text-xl">{service.title}</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <CardDescription className="text-base leading-relaxed mb-4">
+                          {service.description}
+                        </CardDescription>
+                        <ul className="space-y-2">
+                          {service.features.map((feature, idx) => (
+                            <li key={idx} className="flex items-center gap-2 text-sm text-muted-foreground">
+                              <CheckCircle size={16} weight="fill" className="text-primary shrink-0" />
+                              {feature}
+                            </li>
+                          ))}
+                        </ul>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </motion.div>
+            )}
           </div>
         </section>
 
@@ -583,28 +622,50 @@ Make the email professional, concise, and include all relevant customer informat
                 See the quality and attention to detail that goes into every Medina Precision Painting project.
               </p>
             </motion.div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {galleryImages.map((image, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                  className="group relative aspect-[4/3] rounded-xl overflow-hidden border-2 border-border hover:border-primary transition-all duration-300"
-                >
-                  <img 
-                    src={image.image} 
-                    alt={image.title}
-                    className="absolute inset-0 w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-foreground/90 via-foreground/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-end p-6 text-center">
-                    <h3 className="text-lg font-semibold text-background mb-2">{image.title}</h3>
-                    <Badge variant="secondary">{image.category}</Badge>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
+            {isMobile ? (
+              <div className="overflow-hidden" ref={galleryEmblaRef}>
+                <div className="flex gap-4">
+                  {galleryImages.map((image, index) => (
+                    <div key={index} className="flex-[0_0_85%] min-w-0">
+                      <div className="group relative aspect-[4/3] rounded-xl overflow-hidden border-2 border-border">
+                        <img 
+                          src={image.image} 
+                          alt={image.title}
+                          className="absolute inset-0 w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-foreground/90 via-foreground/50 to-transparent flex flex-col items-center justify-end p-6 text-center">
+                          <h3 className="text-lg font-semibold text-background mb-2">{image.title}</h3>
+                          <Badge variant="secondary">{image.category}</Badge>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {galleryImages.map((image, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.1 }}
+                    className="group relative aspect-[4/3] rounded-xl overflow-hidden border-2 border-border hover:border-primary transition-all duration-300"
+                  >
+                    <img 
+                      src={image.image} 
+                      alt={image.title}
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-foreground/90 via-foreground/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-end p-6 text-center">
+                      <h3 className="text-lg font-semibold text-background mb-2">{image.title}</h3>
+                      <Badge variant="secondary">{image.category}</Badge>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            )}
           </div>
         </section>
 
@@ -623,37 +684,67 @@ Make the email professional, concise, and include all relevant customer informat
                 Don't just take our word for it. Here's what Georgia homeowners and businesses say about working with Eddie.
               </p>
             </motion.div>
-            <div className="grid md:grid-cols-3 gap-6">
-              {testimonials.map((testimonial, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <Card className="h-full">
-                    <CardHeader>
-                      <div className="flex items-center gap-1 mb-2">
-                        {[...Array(testimonial.rating)].map((_, i) => (
-                          <Star key={i} size={18} weight="fill" className="text-accent" />
-                        ))}
-                      </div>
-                      <div className="flex items-start gap-3">
-                        <Quotes size={24} weight="duotone" className="text-primary shrink-0" />
-                        <div>
-                          <CardTitle className="text-lg">{testimonial.name}</CardTitle>
-                          <CardDescription>{testimonial.location}</CardDescription>
+            {isMobile ? (
+              <div className="overflow-hidden" ref={testimonialsEmblaRef}>
+                <div className="flex gap-4">
+                  {testimonials.map((testimonial, index) => (
+                    <div key={index} className="flex-[0_0_85%] min-w-0">
+                      <Card className="h-full">
+                        <CardHeader>
+                          <div className="flex items-center gap-1 mb-2">
+                            {[...Array(testimonial.rating)].map((_, i) => (
+                              <Star key={i} size={18} weight="fill" className="text-accent" />
+                            ))}
+                          </div>
+                          <div className="flex items-start gap-3">
+                            <Quotes size={24} weight="duotone" className="text-primary shrink-0" />
+                            <div>
+                              <CardTitle className="text-lg">{testimonial.name}</CardTitle>
+                              <CardDescription>{testimonial.location}</CardDescription>
+                            </div>
+                          </div>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-muted-foreground leading-relaxed">{testimonial.text}</p>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="grid md:grid-cols-3 gap-6">
+                {testimonials.map((testimonial, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.1 }}
+                  >
+                    <Card className="h-full">
+                      <CardHeader>
+                        <div className="flex items-center gap-1 mb-2">
+                          {[...Array(testimonial.rating)].map((_, i) => (
+                            <Star key={i} size={18} weight="fill" className="text-accent" />
+                          ))}
                         </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-muted-foreground leading-relaxed">{testimonial.text}</p>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))}
-            </div>
+                        <div className="flex items-start gap-3">
+                          <Quotes size={24} weight="duotone" className="text-primary shrink-0" />
+                          <div>
+                            <CardTitle className="text-lg">{testimonial.name}</CardTitle>
+                            <CardDescription>{testimonial.location}</CardDescription>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-muted-foreground leading-relaxed">{testimonial.text}</p>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+            )}
           </div>
         </section>
 
