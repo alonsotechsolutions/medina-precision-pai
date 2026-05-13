@@ -149,7 +149,7 @@ function App() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  const VALID_PAGES = ['home', 'services', 'gallery', 'testimonials', 'about', 'process', 'estimator', 'contact'] as const
+  const VALID_PAGES = ['home', 'services', 'gallery', 'about', 'contact'] as const
   type PageKey = typeof VALID_PAGES[number]
   const parseHashPage = (): PageKey => {
     if (typeof window === 'undefined') return 'home'
@@ -176,12 +176,9 @@ function App() {
   }, [])
   const pageTitles: Record<PageKey, string> = {
     home: 'Medina Precision Painting — Warner Robins, GA',
-    services: 'Services — Medina Precision Painting',
+    services: 'Services & Process — Medina Precision Painting',
     gallery: 'Gallery — Medina Precision Painting',
-    testimonials: 'Testimonials — Medina Precision Painting',
     about: 'About — Medina Precision Painting',
-    process: 'Our Process — Medina Precision Painting',
-    estimator: 'Cost Estimator — Medina Precision Painting',
     contact: 'Contact — Medina Precision Painting',
   }
   useEffect(() => {
@@ -207,7 +204,7 @@ function App() {
   //   2. Always also open a pre-filled mailto: link as a guaranteed fallback,
   //      so the visitor's mail client can send the lead even if Formspree is
   //      not configured or the network call fails.
-  const BUSINESS_EMAIL = 'info@medinaprecisionpainting.com'
+  const BUSINESS_EMAIL = 'azianninja1295@gmail.com'
 
   const buildEmailBody = (quote: QuoteRequest) => (
     `New quote request from ${quote.name}\n\n` +
@@ -691,9 +688,9 @@ function App() {
       <style>{`[data-page]:not([data-page~="${currentPage}"]){display:none !important;}`}</style>
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-24">
+          <div className="flex items-center justify-between h-32">
             <div className="flex items-center">
-              <img src={logoImage} alt="Medina Precision Painting" className="h-20 w-auto" />
+              <img src={logoImage} alt="Medina Precision Painting" className="h-28 w-auto" />
             </div>
             <nav className="hidden md:flex gap-2 ml-8">
               <a
@@ -705,10 +702,7 @@ function App() {
               {[
                 { label: 'Services', href: '#/services', page: 'services' as PageKey },
                 { label: 'Gallery', href: '#/gallery', page: 'gallery' as PageKey },
-                { label: 'Testimonials', href: '#/testimonials', page: 'testimonials' as PageKey },
                 { label: 'About', href: '#/about', page: 'about' as PageKey },
-                { label: 'Process', href: '#/process', page: 'process' as PageKey },
-                { label: 'Estimator', href: '#/estimator', page: 'estimator' as PageKey },
                 { label: 'Contact', href: '#/contact', page: 'contact' as PageKey }
               ].map(tab => (
                 <a
@@ -850,10 +844,7 @@ function App() {
           {[
             { label: 'Services', href: '#/services', page: 'services' as PageKey },
             { label: 'Gallery', href: '#/gallery', page: 'gallery' as PageKey },
-            { label: 'Reviews', href: '#/testimonials', page: 'testimonials' as PageKey },
             { label: 'About', href: '#/about', page: 'about' as PageKey },
-            { label: 'Process', href: '#/process', page: 'process' as PageKey },
-            { label: 'Estimator', href: '#/estimator', page: 'estimator' as PageKey },
             { label: 'Contact', href: '#/contact', page: 'contact' as PageKey }
           ].map(tab => (
             <a
@@ -883,7 +874,7 @@ function App() {
           </Dialog>
         </motion.div>
       )}
-      <main className="pt-24 text-lg">
+      <main className="pt-44 md:pt-36 text-lg">
         <section data-page="home" className="relative py-24 sm:py-32 bg-gradient-to-br from-primary via-secondary to-accent overflow-hidden">
           <div className="absolute inset-0 opacity-10" style={{
             backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 35px, currentColor 35px, currentColor 36px)`
@@ -1168,7 +1159,7 @@ function App() {
           </div>
         </section>
 
-        <section id="testimonials" data-page="home testimonials" className="py-20 bg-background">
+        <section id="testimonials" data-page="home about" className="py-20 bg-background">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -1277,7 +1268,7 @@ function App() {
           </div>
         </section>
 
-        <section data-page="home about" className="py-20 bg-muted/30">
+        <section data-page="about" className="py-20 bg-muted/30">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -1349,7 +1340,7 @@ function App() {
           </div>
         </section>
 
-        <section id="about" data-page="home about" className="py-20 bg-background">
+        <section id="about" data-page="about" className="py-20 bg-background">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <motion.div
@@ -1388,7 +1379,7 @@ function App() {
         </section>
 
         {/* Our Process — 5-step trust-builder */}
-        <section id="process" data-page="home process" className="py-20 bg-background">
+        <section id="process" data-page="services" className="py-20 bg-background">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -1436,7 +1427,7 @@ function App() {
         </section>
 
         {/* Paint Cost Estimator — interactive lead-generation tool */}
-        <section id="estimator" data-page="home process estimator" className="py-20 bg-muted/30">
+        <section id="estimator" data-page="services" className="py-20 bg-muted/30">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -1614,7 +1605,7 @@ function App() {
         </section>
 
         {/* Warranty & Guarantee */}
-        <section id="warranty" data-page="home about" className="py-20 bg-muted/30">
+        <section id="warranty" data-page="about" className="py-20 bg-muted/30">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <Card className="overflow-hidden">
               <div className="grid md:grid-cols-[auto_1fr] gap-6 p-6 sm:p-10 items-center">
@@ -1642,7 +1633,7 @@ function App() {
         </section>
 
         {/* FAQ */}
-        <section id="faq" data-page="home services" className="py-20 bg-background">
+        <section id="faq" data-page="services" className="py-20 bg-background">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -1681,7 +1672,7 @@ function App() {
           </div>
         </section>
 
-        <section data-page="home contact" className="py-16 bg-muted/30">
+        <section data-page="contact" className="py-16 bg-muted/30">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -1714,7 +1705,7 @@ function App() {
           </div>
         </section>
 
-        <section data-page="home services gallery testimonials about process estimator contact" className="py-20 bg-primary text-primary-foreground relative overflow-hidden">
+        <section data-page="home services gallery about contact" className="py-20 bg-primary text-primary-foreground relative overflow-hidden">
           <div className="absolute inset-0 opacity-5" style={{
             backgroundImage: `repeating-conic-gradient(from 0deg at 50% 50%, transparent 0deg, currentColor 1deg, transparent 2deg, transparent 60deg)`
           }}></div>
@@ -1784,8 +1775,8 @@ function App() {
                   <EnvelopeSimple size={28} weight="duotone" className="text-primary" />
                 </div>
                 <h3 className="font-semibold mb-2">Email</h3>
-                <a href="mailto:info@medinaprecisionpainting.com" className="text-muted-foreground hover:text-primary transition-colors break-all">
-                  info@medinaprecisionpainting.com
+                <a href="mailto:azianninja1295@gmail.com" className="text-muted-foreground hover:text-primary transition-colors break-all">
+                  azianninja1295@gmail.com
                 </a>
               </motion.div>
               <motion.div
@@ -2164,8 +2155,8 @@ function App() {
             <div>
               <h4 className="font-semibold mb-4">Quick Links</h4>
               <ul className="space-y-2 text-sm opacity-80">
-                <li><a href="#/process" className="hover:opacity-100 hover:text-accent transition-colors">Our Process</a></li>
-                <li><a href="#/estimator" className="hover:opacity-100 hover:text-accent transition-colors">Cost Estimator</a></li>
+                <li><a href="#/services" className="hover:opacity-100 hover:text-accent transition-colors">Our Process</a></li>
+                <li><a href="#/services" className="hover:opacity-100 hover:text-accent transition-colors">Cost Estimator</a></li>
                 <li><a href="#palettes" className="hover:opacity-100 hover:text-accent transition-colors">Color Inspiration</a></li>
                 <li><a href="#warranty" className="hover:opacity-100 hover:text-accent transition-colors">Warranty</a></li>
                 <li><a href="#faq" className="hover:opacity-100 hover:text-accent transition-colors">FAQ</a></li>
@@ -2181,7 +2172,7 @@ function App() {
                 </li>
                 <li className="flex items-start gap-2">
                   <EnvelopeSimple size={16} weight="bold" className="mt-0.5 shrink-0" />
-                  <a href="mailto:info@medinaprecisionpainting.com" className="hover:opacity-100 hover:text-accent transition-colors break-all">info@medinaprecisionpainting.com</a>
+                  <a href="mailto:azianninja1295@gmail.com" className="hover:opacity-100 hover:text-accent transition-colors break-all">azianninja1295@gmail.com</a>
                 </li>
                 <li className="flex items-start gap-2">
                   <MapPin size={16} weight="bold" className="mt-0.5 shrink-0" />
