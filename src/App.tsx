@@ -616,6 +616,26 @@ Make the email professional, concise, and include all relevant customer informat
             <div className="flex items-center">
               <img src={logoImage} alt="Medina Precision Painting" className="h-20 w-auto" />
             </div>
+            <nav className="hidden md:flex gap-2 ml-8">
+              {[
+                { label: 'Services', href: '#services' },
+                { label: 'Gallery', href: '#gallery' },
+                { label: 'Testimonials', href: '#testimonials' },
+                { label: 'About', href: '#about' },
+                { label: 'Process', href: '#process' },
+                { label: 'Estimator', href: '#estimator' },
+                { label: 'Contact', href: '#contact' }
+              ].map(tab => (
+                <a
+                  key={tab.href}
+                  href={tab.href}
+                  className="px-4 py-2 rounded-md text-sm font-medium text-muted-foreground hover:text-primary hover:bg-accent/30 transition-colors"
+                  style={{ scrollBehavior: 'smooth' }}
+                >
+                  {tab.label}
+                </a>
+              ))}
+            </nav>
             <div className="flex items-center gap-4">
               {isOwner && (
                 <Button
@@ -645,154 +665,33 @@ Make the email professional, concise, and include all relevant customer informat
                       Fill out the form below and we'll contact you within 24 hours with a detailed estimate.
                     </DialogDescription>
                   </DialogHeader>
-                  <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="name">Name *</Label>
-                      <Input
-                        id="name"
-                        required
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        placeholder="John Smith"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email *</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        required
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        placeholder="john@example.com"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="phone">Phone *</Label>
-                      <Input
-                        id="phone"
-                        type="tel"
-                        required
-                        value={formData.phone}
-                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        placeholder="(555) 123-4567"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="address">Property Address</Label>
-                      <Input
-                        id="address"
-                        value={formData.address}
-                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                        placeholder="123 Main St, Warner Robins, GA"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="service-type">Service Type *</Label>
-                      <Select
-                        required
-                        value={formData.serviceType}
-                        onValueChange={(value) => setFormData({ ...formData, serviceType: value })}
-                      >
-                        <SelectTrigger id="service-type">
-                          <SelectValue placeholder="Select a service" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="interior">Interior Painting</SelectItem>
-                          <SelectItem value="exterior">Exterior Painting</SelectItem>
-                          <SelectItem value="cabinets">Cabinet Refinishing</SelectItem>
-                          <SelectItem value="commercial">Commercial Painting</SelectItem>
-                          <SelectItem value="pressure-washing">Pressure Washing</SelectItem>
-                          <SelectItem value="drywall-repair">Drywall &amp; Repair</SelectItem>
-                          <SelectItem value="deck-fence-staining">Deck &amp; Fence Staining</SelectItem>
-                          <SelectItem value="popcorn-ceiling">Popcorn Ceiling Removal</SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="property-type">Property Type</Label>
-                      <Select
-                        value={formData.propertyType}
-                        onValueChange={(value) => setFormData({ ...formData, propertyType: value })}
-                      >
-                        <SelectTrigger id="property-type">
-                          <SelectValue placeholder="Select property type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="residential">Residential</SelectItem>
-                          <SelectItem value="commercial">Commercial</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="project-description">Project Description</Label>
-                      <Textarea
-                        id="project-description"
-                        value={formData.projectDescription}
-                        onChange={(e) => setFormData({ ...formData, projectDescription: e.target.value })}
-                        placeholder="Tell us about your project (optional)"
-                        rows={4}
-                      />
-                    </div>
-                    <div className="grid sm:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="preferred-date">Preferred Start Date</Label>
-                        <Input
-                          id="preferred-date"
-                          type="date"
-                          value={formData.preferredDate}
-                          onChange={(e) => setFormData({ ...formData, preferredDate: e.target.value })}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="budget-range">Budget Range</Label>
-                        <Select
-                          value={formData.budgetRange}
-                          onValueChange={(value) => setFormData({ ...formData, budgetRange: value })}
-                        >
-                          <SelectTrigger id="budget-range">
-                            <SelectValue placeholder="Select budget" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="under-1000">Under $1,000</SelectItem>
-                            <SelectItem value="1000-3000">$1,000 – $3,000</SelectItem>
-                            <SelectItem value="3000-7500">$3,000 – $7,500</SelectItem>
-                            <SelectItem value="7500-15000">$7,500 – $15,000</SelectItem>
-                            <SelectItem value="15000-plus">$15,000+</SelectItem>
-                            <SelectItem value="not-sure">Not sure yet</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="referral-source">How Did You Hear About Us?</Label>
-                      <Select
-                        value={formData.referralSource}
-                        onValueChange={(value) => setFormData({ ...formData, referralSource: value })}
-                      >
-                        <SelectTrigger id="referral-source">
-                          <SelectValue placeholder="Select an option" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="google">Google Search</SelectItem>
-                          <SelectItem value="facebook">Facebook</SelectItem>
-                          <SelectItem value="instagram">Instagram</SelectItem>
-                          <SelectItem value="referral">Friend / Referral</SelectItem>
-                          <SelectItem value="repeat">Repeat Customer</SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <Button type="submit" className="w-full bg-primary hover:bg-primary/90">
-                      Submit Request
-                    </Button>
-                  </form>
+                  {/* ...existing code... (quote form) ... */}
                 </DialogContent>
               </Dialog>
             </div>
           </div>
         </div>
+        {/* Mobile tab bar */}
+        <nav className="md:hidden flex justify-center gap-1 border-t border-border bg-background/95 backdrop-blur-md sticky top-[96px] z-40">
+          {[
+            { label: 'Services', href: '#services' },
+            { label: 'Gallery', href: '#gallery' },
+            { label: 'Testimonials', href: '#testimonials' },
+            { label: 'About', href: '#about' },
+            { label: 'Process', href: '#process' },
+            { label: 'Estimator', href: '#estimator' },
+            { label: 'Contact', href: '#contact' }
+          ].map(tab => (
+            <a
+              key={tab.href}
+              href={tab.href}
+              className="px-2 py-2 text-xs font-medium text-muted-foreground hover:text-primary"
+              style={{ scrollBehavior: 'smooth' }}
+            >
+              {tab.label}
+            </a>
+          ))}
+        </nav>
       </header>
       {showFloatingCTA && (
         <motion.div
