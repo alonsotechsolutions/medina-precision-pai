@@ -3,7 +3,6 @@ import { ErrorBoundary } from "react-error-boundary";
 import "@github/spark/spark"
 
 import App from './App.tsx'
-import { BrowserRouter } from 'react-router-dom'
 import { ErrorFallback } from './ErrorFallback.tsx'
 
 import "./main.css"
@@ -12,8 +11,6 @@ import "./index.css"
 
 createRoot(document.getElementById('root')!).render(
   <ErrorBoundary FallbackComponent={ErrorFallback}>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <App />
   </ErrorBoundary>
 )
