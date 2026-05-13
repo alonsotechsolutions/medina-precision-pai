@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -27,7 +27,9 @@ import {
   Quotes,
   ClipboardText,
   Trash,
-  Eye
+  Eye,
+  CaretLeft,
+  CaretRight
 } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 import { motion } from 'framer-motion'
@@ -68,9 +70,44 @@ function App() {
   
   const [quotes, setQuotes] = useKV<QuoteRequest[]>('quote-requests', [])
   
-  const [servicesEmblaRef] = useEmblaCarousel({ loop: false, align: 'start' })
-  const [galleryEmblaRef] = useEmblaCarousel({ loop: false, align: 'start' })
-  const [testimonialsEmblaRef] = useEmblaCarousel({ loop: false, align: 'start' })
+  const [servicesEmblaRef, servicesEmblaApi] = useEmblaCarousel({ loop: true })
+  const [galleryEmblaRef, galleryEmblaApi] = useEmblaCarousel({ loop: true })
+  const [testimonialsEmblaRef, testimonialsEmblaApi] = useEmblaCarousel({ loop: true })
+  
+  const [servicesIndex, setServicesIndex] = useState(0)
+  const [galleryIndex, setGalleryIndex] = useState(0)
+  const [testimonialsIndex, setTestimonialsIndex] = useState(0)
+  
+  const scrollServicesNext = useCallback(() => servicesEmblaApi?.scrollNext(), [servicesEmblaApi])
+  const scrollServicesPrev = useCallback(() => servicesEmblaApi?.scrollPrev(), [servicesEmblaApi])
+  const scrollGalleryNext = useCallback(() => galleryEmblaApi?.scrollNext(), [galleryEmblaApi])
+  const scrollGalleryPrev = useCallback(() => galleryEmblaApi?.scrollPrev(), [galleryEmblaApi])
+  const scrollTestimonialsNext = useCallback(() => testimonialsEmblaApi?.scrollNext(), [testimonialsEmblaApi])
+  const scrollTestimonialsPrev = useCallback(() => testimonialsEmblaApi?.scrollPrev(), [testimonialsEmblaApi])
+  
+  useEffect(() => {
+    if (!servicesEmblaApi) return
+    const onSelect = () => setServicesIndex(servicesEmblaApi.selectedScrollSnap())
+    servicesEmblaApi.on('select', onSelect)
+    onSelect()
+    return () => { servicesEmblaApi.off('select', onSelect) }
+  }, [servicesEmblaApi])
+  
+  useEffect(() => {
+    if (!galleryEmblaApi) return
+    const onSelect = () => setGalleryIndex(galleryEmblaApi.selectedScrollSnap())
+    galleryEmblaApi.on('select', onSelect)
+    onSelect()
+    return () => { galleryEmblaApi.off('select', onSelect) }
+  }, [galleryEmblaApi])
+  
+  useEffect(() => {
+    if (!testimonialsEmblaApi) return
+    const onSelect = () => setTestimonialsIndex(testimonialsEmblaApi.selectedScrollSnap())
+    testimonialsEmblaApi.on('select', onSelect)
+    onSelect()
+    return () => { testimonialsEmblaApi.off('select', onSelect) }
+  }, [testimonialsEmblaApi])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -540,33 +577,63 @@ Make the email professional, concise, and include all relevant customer informat
               </p>
             </motion.div>
             {isMobile ? (
-              <div className="overflow-hidden" ref={servicesEmblaRef}>
-                <div className="flex gap-4">
-                  {services.map((service, index) => (
-                    <div key={index} className="flex-[0_0_85%] min-w-0">
-                      <Card className="h-full transition-all duration-300 border-border">
-                        <CardHeader>
-                          <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                            <service.icon size={28} weight="duotone" className="text-primary" />
-                          </div>
-                          <CardTitle className="text-xl">{service.title}</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <CardDescription className="text-base leading-relaxed mb-4">
-                            {service.description}
-                          </CardDescription>
-                          <ul className="space-y-2">
-                            {service.features.map((feature, idx) => (
-                              <li key={idx} className="flex items-center gap-2 text-sm text-muted-foreground">
-                                <CheckCircle size={16} weight="fill" className="text-primary shrink-0" />
-                                {feature}
-                              </li>
-                            ))}
-                          </ul>
-                        </CardContent>
-                      </Card>
-                    </div>
-                  ))}
+              <div className="relative">
+                <div className="overflow-hidden" ref={servicesEmblaRef}>
+                  <div className="flex">
+                    {services.map((service, index) => (
+                      <div key={index} className="flex-[0_0_100%] min-w-0">
+                        <Card className="h-full transition-all duration-300 border-border mx-2">
+                          <CardHeader>
+                            <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                              <service.icon size={28} weight="duotone" className="text-primary" />
+                            </div>
+                            <CardTitle className="text-xl">{service.title}</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <CardDescription className="text-base leading-relaxed mb-4">
+                              {service.description}
+                            </CardDescription>
+                            <ul className="space-y-2">
+                              {service.features.map((feature, idx) => (
+                                <li key={idx} className="flex items-center gap-2 text-sm text-muted-foreground">
+                                  <CheckCircle size={16} weight="fill" className="text-primary shrink-0" />
+                                  {feature}
+                                </li>
+                              ))}
+                            </ul>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="flex items-center justify-center gap-4 mt-6">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={scrollServicesPrev}
+                    className="rounded-full"
+                  >
+                    <CaretLeft size={20} weight="bold" />
+                  </Button>
+                  <div className="flex gap-1.5">
+                    {services.map((_, index) => (
+                      <div
+                        key={index}
+                        className={`h-2 rounded-full transition-all duration-300 ${
+                          index === servicesIndex ? 'w-8 bg-primary' : 'w-2 bg-border'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={scrollServicesNext}
+                    className="rounded-full"
+                  >
+                    <CaretRight size={20} weight="bold" />
+                  </Button>
                 </div>
               </div>
             ) : (
@@ -623,23 +690,53 @@ Make the email professional, concise, and include all relevant customer informat
               </p>
             </motion.div>
             {isMobile ? (
-              <div className="overflow-hidden" ref={galleryEmblaRef}>
-                <div className="flex gap-4">
-                  {galleryImages.map((image, index) => (
-                    <div key={index} className="flex-[0_0_85%] min-w-0">
-                      <div className="group relative aspect-[4/3] rounded-xl overflow-hidden border-2 border-border">
-                        <img 
-                          src={image.image} 
-                          alt={image.title}
-                          className="absolute inset-0 w-full h-full object-cover"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-foreground/90 via-foreground/50 to-transparent flex flex-col items-center justify-end p-6 text-center">
-                          <h3 className="text-lg font-semibold text-background mb-2">{image.title}</h3>
-                          <Badge variant="secondary">{image.category}</Badge>
+              <div className="relative">
+                <div className="overflow-hidden" ref={galleryEmblaRef}>
+                  <div className="flex">
+                    {galleryImages.map((image, index) => (
+                      <div key={index} className="flex-[0_0_100%] min-w-0">
+                        <div className="group relative aspect-[4/3] rounded-xl overflow-hidden border-2 border-border mx-2">
+                          <img 
+                            src={image.image} 
+                            alt={image.title}
+                            className="absolute inset-0 w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-foreground/90 via-foreground/50 to-transparent flex flex-col items-center justify-end p-6 text-center">
+                            <h3 className="text-lg font-semibold text-background mb-2">{image.title}</h3>
+                            <Badge variant="secondary">{image.category}</Badge>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
+                </div>
+                <div className="flex items-center justify-center gap-4 mt-6">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={scrollGalleryPrev}
+                    className="rounded-full"
+                  >
+                    <CaretLeft size={20} weight="bold" />
+                  </Button>
+                  <div className="flex gap-1.5">
+                    {galleryImages.map((_, index) => (
+                      <div
+                        key={index}
+                        className={`h-2 rounded-full transition-all duration-300 ${
+                          index === galleryIndex ? 'w-8 bg-primary' : 'w-2 bg-border'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={scrollGalleryNext}
+                    className="rounded-full"
+                  >
+                    <CaretRight size={20} weight="bold" />
+                  </Button>
                 </div>
               </div>
             ) : (
@@ -685,31 +782,61 @@ Make the email professional, concise, and include all relevant customer informat
               </p>
             </motion.div>
             {isMobile ? (
-              <div className="overflow-hidden" ref={testimonialsEmblaRef}>
-                <div className="flex gap-4">
-                  {testimonials.map((testimonial, index) => (
-                    <div key={index} className="flex-[0_0_85%] min-w-0">
-                      <Card className="h-full">
-                        <CardHeader>
-                          <div className="flex items-center gap-1 mb-2">
-                            {[...Array(testimonial.rating)].map((_, i) => (
-                              <Star key={i} size={18} weight="fill" className="text-accent" />
-                            ))}
-                          </div>
-                          <div className="flex items-start gap-3">
-                            <Quotes size={24} weight="duotone" className="text-primary shrink-0" />
-                            <div>
-                              <CardTitle className="text-lg">{testimonial.name}</CardTitle>
-                              <CardDescription>{testimonial.location}</CardDescription>
+              <div className="relative">
+                <div className="overflow-hidden" ref={testimonialsEmblaRef}>
+                  <div className="flex">
+                    {testimonials.map((testimonial, index) => (
+                      <div key={index} className="flex-[0_0_100%] min-w-0">
+                        <Card className="h-full mx-2">
+                          <CardHeader>
+                            <div className="flex items-center gap-1 mb-2">
+                              {[...Array(testimonial.rating)].map((_, i) => (
+                                <Star key={i} size={18} weight="fill" className="text-accent" />
+                              ))}
                             </div>
-                          </div>
-                        </CardHeader>
-                        <CardContent>
-                          <p className="text-muted-foreground leading-relaxed">{testimonial.text}</p>
-                        </CardContent>
-                      </Card>
-                    </div>
-                  ))}
+                            <div className="flex items-start gap-3">
+                              <Quotes size={24} weight="duotone" className="text-primary shrink-0" />
+                              <div>
+                                <CardTitle className="text-lg">{testimonial.name}</CardTitle>
+                                <CardDescription>{testimonial.location}</CardDescription>
+                              </div>
+                            </div>
+                          </CardHeader>
+                          <CardContent>
+                            <p className="text-muted-foreground leading-relaxed">{testimonial.text}</p>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="flex items-center justify-center gap-4 mt-6">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={scrollTestimonialsPrev}
+                    className="rounded-full"
+                  >
+                    <CaretLeft size={20} weight="bold" />
+                  </Button>
+                  <div className="flex gap-1.5">
+                    {testimonials.map((_, index) => (
+                      <div
+                        key={index}
+                        className={`h-2 rounded-full transition-all duration-300 ${
+                          index === testimonialsIndex ? 'w-8 bg-primary' : 'w-2 bg-border'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={scrollTestimonialsNext}
+                    className="rounded-full"
+                  >
+                    <CaretRight size={20} weight="bold" />
+                  </Button>
                 </div>
               </div>
             ) : (
