@@ -149,6 +149,46 @@ function App() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  const VALID_PAGES = ['home', 'services', 'gallery', 'testimonials', 'about', 'process', 'estimator', 'contact'] as const
+  type PageKey = typeof VALID_PAGES[number]
+  const parseHashPage = (): PageKey => {
+    if (typeof window === 'undefined') return 'home'
+    const h = window.location.hash
+    if (h.startsWith('#/')) {
+      const key = h.slice(2).toLowerCase() as PageKey
+      return (VALID_PAGES as readonly string[]).includes(key) ? key : 'home'
+    }
+    return 'home'
+  }
+  const [currentPage, setCurrentPage] = useState<PageKey>(() => parseHashPage())
+  useEffect(() => {
+    const onHashChange = () => {
+      const next = parseHashPage()
+      setCurrentPage(prev => {
+        if (prev !== next) {
+          window.scrollTo({ top: 0, behavior: 'smooth' })
+        }
+        return next
+      })
+    }
+    window.addEventListener('hashchange', onHashChange)
+    return () => window.removeEventListener('hashchange', onHashChange)
+  }, [])
+  const pageTitles: Record<PageKey, string> = {
+    home: 'Medina Precision Painting — Warner Robins, GA',
+    services: 'Services — Medina Precision Painting',
+    gallery: 'Gallery — Medina Precision Painting',
+    testimonials: 'Testimonials — Medina Precision Painting',
+    about: 'About — Medina Precision Painting',
+    process: 'Our Process — Medina Precision Painting',
+    estimator: 'Cost Estimator — Medina Precision Painting',
+    contact: 'Contact — Medina Precision Painting',
+  }
+  useEffect(() => {
+    document.title = pageTitles[currentPage]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage])
+
   useEffect(() => {
     const checkOwner = async () => {
       const user = await window.spark.user()
@@ -647,7 +687,8 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background" data-current-page={currentPage}>
+      <style>{`[data-page]:not([data-page~="${currentPage}"]){display:none !important;}`}</style>
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-24">
@@ -655,19 +696,26 @@ function App() {
               <img src={logoImage} alt="Medina Precision Painting" className="h-20 w-auto" />
             </div>
             <nav className="hidden md:flex gap-2 ml-8">
+              <a
+                href="#/"
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${currentPage === 'home' ? 'text-primary bg-accent/40' : 'text-muted-foreground hover:text-primary hover:bg-accent/30'}`}
+              >
+                Home
+              </a>
               {[
-                { label: 'Services', href: '#services' },
-                { label: 'Gallery', href: '#gallery' },
-                { label: 'Testimonials', href: '#testimonials' },
-                { label: 'About', href: '#about' },
-                { label: 'Process', href: '#process' },
-                { label: 'Estimator', href: '#estimator' },
-                { label: 'Contact', href: '#contact' }
+                { label: 'Services', href: '#/services', page: 'services' as PageKey },
+                { label: 'Gallery', href: '#/gallery', page: 'gallery' as PageKey },
+                { label: 'Testimonials', href: '#/testimonials', page: 'testimonials' as PageKey },
+                { label: 'About', href: '#/about', page: 'about' as PageKey },
+                { label: 'Process', href: '#/process', page: 'process' as PageKey },
+                { label: 'Estimator', href: '#/estimator', page: 'estimator' as PageKey },
+                { label: 'Contact', href: '#/contact', page: 'contact' as PageKey }
               ].map(tab => (
                 <a
                   key={tab.href}
                   href={tab.href}
-                  className="px-4 py-2 rounded-md text-sm font-medium text-muted-foreground hover:text-primary hover:bg-accent/30 transition-colors"
+                  aria-current={currentPage === tab.page ? 'page' : undefined}
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${currentPage === tab.page ? 'text-primary bg-accent/40' : 'text-muted-foreground hover:text-primary hover:bg-accent/30'}`}
                 >
                   {tab.label}
                 </a>
@@ -793,19 +841,26 @@ function App() {
         </div>
         {/* Mobile tab bar */}
         <nav className="md:hidden flex justify-center gap-1 border-t border-border bg-background/95 backdrop-blur-md overflow-x-auto">
+          <a
+            href="#/"
+            className={`px-2 py-2 text-xs font-medium whitespace-nowrap ${currentPage === 'home' ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`}
+          >
+            Home
+          </a>
           {[
-            { label: 'Services', href: '#services' },
-            { label: 'Gallery', href: '#gallery' },
-            { label: 'Reviews', href: '#testimonials' },
-            { label: 'About', href: '#about' },
-            { label: 'Process', href: '#process' },
-            { label: 'Estimator', href: '#estimator' },
-            { label: 'Contact', href: '#contact' }
+            { label: 'Services', href: '#/services', page: 'services' as PageKey },
+            { label: 'Gallery', href: '#/gallery', page: 'gallery' as PageKey },
+            { label: 'Reviews', href: '#/testimonials', page: 'testimonials' as PageKey },
+            { label: 'About', href: '#/about', page: 'about' as PageKey },
+            { label: 'Process', href: '#/process', page: 'process' as PageKey },
+            { label: 'Estimator', href: '#/estimator', page: 'estimator' as PageKey },
+            { label: 'Contact', href: '#/contact', page: 'contact' as PageKey }
           ].map(tab => (
             <a
               key={tab.href}
               href={tab.href}
-              className="px-2 py-2 text-xs font-medium text-muted-foreground hover:text-primary whitespace-nowrap"
+              aria-current={currentPage === tab.page ? 'page' : undefined}
+              className={`px-2 py-2 text-xs font-medium whitespace-nowrap ${currentPage === tab.page ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`}
             >
               {tab.label}
             </a>
@@ -829,7 +884,7 @@ function App() {
         </motion.div>
       )}
       <main className="pt-24 text-lg">
-        <section className="relative py-24 sm:py-32 bg-gradient-to-br from-primary via-secondary to-accent overflow-hidden">
+        <section data-page="home" className="relative py-24 sm:py-32 bg-gradient-to-br from-primary via-secondary to-accent overflow-hidden">
           <div className="absolute inset-0 opacity-10" style={{
             backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 35px, currentColor 35px, currentColor 36px)`
           }}></div>
@@ -885,7 +940,7 @@ function App() {
         </section>
 
         {/* Stats / Social Proof Counter */}
-        <section className="py-12 bg-muted/30 border-y border-border">
+        <section data-page="home" className="py-12 bg-muted/30 border-y border-border">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
               {stats.map((stat, index) => (
@@ -908,7 +963,7 @@ function App() {
           </div>
         </section>
 
-        <section id="services" className="py-20 bg-background">
+        <section id="services" data-page="home services" className="py-20 bg-background">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -1021,7 +1076,7 @@ function App() {
           </div>
         </section>
 
-        <section id="gallery" className="py-20 bg-muted/30">
+        <section id="gallery" data-page="home gallery" className="py-20 bg-muted/30">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -1113,7 +1168,7 @@ function App() {
           </div>
         </section>
 
-        <section id="testimonials" className="py-20 bg-background">
+        <section id="testimonials" data-page="home testimonials" className="py-20 bg-background">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -1222,7 +1277,7 @@ function App() {
           </div>
         </section>
 
-        <section className="py-20 bg-muted/30">
+        <section data-page="home about" className="py-20 bg-muted/30">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -1294,7 +1349,7 @@ function App() {
           </div>
         </section>
 
-        <section id="about" className="py-20 bg-background">
+        <section id="about" data-page="home about" className="py-20 bg-background">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <motion.div
@@ -1333,7 +1388,7 @@ function App() {
         </section>
 
         {/* Our Process — 5-step trust-builder */}
-        <section id="process" className="py-20 bg-background">
+        <section id="process" data-page="home process" className="py-20 bg-background">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -1381,7 +1436,7 @@ function App() {
         </section>
 
         {/* Paint Cost Estimator — interactive lead-generation tool */}
-        <section id="estimator" className="py-20 bg-muted/30">
+        <section id="estimator" data-page="home process estimator" className="py-20 bg-muted/30">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -1503,7 +1558,7 @@ function App() {
         </section>
 
         {/* Color Palette Inspiration */}
-        <section id="palettes" className="py-20 bg-background">
+        <section id="palettes" data-page="home" className="py-20 bg-background">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -1559,7 +1614,7 @@ function App() {
         </section>
 
         {/* Warranty & Guarantee */}
-        <section id="warranty" className="py-20 bg-muted/30">
+        <section id="warranty" data-page="home about" className="py-20 bg-muted/30">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <Card className="overflow-hidden">
               <div className="grid md:grid-cols-[auto_1fr] gap-6 p-6 sm:p-10 items-center">
@@ -1587,7 +1642,7 @@ function App() {
         </section>
 
         {/* FAQ */}
-        <section id="faq" className="py-20 bg-background">
+        <section id="faq" data-page="home services" className="py-20 bg-background">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -1626,7 +1681,7 @@ function App() {
           </div>
         </section>
 
-        <section className="py-16 bg-muted/30">
+        <section data-page="home contact" className="py-16 bg-muted/30">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -1659,7 +1714,7 @@ function App() {
           </div>
         </section>
 
-        <section className="py-20 bg-primary text-primary-foreground relative overflow-hidden">
+        <section data-page="home services gallery testimonials about process estimator contact" className="py-20 bg-primary text-primary-foreground relative overflow-hidden">
           <div className="absolute inset-0 opacity-5" style={{
             backgroundImage: `repeating-conic-gradient(from 0deg at 50% 50%, transparent 0deg, currentColor 1deg, transparent 2deg, transparent 60deg)`
           }}></div>
@@ -1687,7 +1742,7 @@ function App() {
           </div>
         </section>
 
-        <section id="contact" className="py-20 bg-background">
+        <section id="contact" data-page="home contact" className="py-20 bg-background">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -2109,8 +2164,8 @@ function App() {
             <div>
               <h4 className="font-semibold mb-4">Quick Links</h4>
               <ul className="space-y-2 text-sm opacity-80">
-                <li><a href="#process" className="hover:opacity-100 hover:text-accent transition-colors">Our Process</a></li>
-                <li><a href="#estimator" className="hover:opacity-100 hover:text-accent transition-colors">Cost Estimator</a></li>
+                <li><a href="#/process" className="hover:opacity-100 hover:text-accent transition-colors">Our Process</a></li>
+                <li><a href="#/estimator" className="hover:opacity-100 hover:text-accent transition-colors">Cost Estimator</a></li>
                 <li><a href="#palettes" className="hover:opacity-100 hover:text-accent transition-colors">Color Inspiration</a></li>
                 <li><a href="#warranty" className="hover:opacity-100 hover:text-accent transition-colors">Warranty</a></li>
                 <li><a href="#faq" className="hover:opacity-100 hover:text-accent transition-colors">FAQ</a></li>
