@@ -690,7 +690,9 @@ function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-32">
             <div className="flex items-center">
-              <img src={logoImage} alt="Medina Precision Painting" className="h-28 w-auto" />
+              <a href="#/" aria-label="Go to home page" className="inline-flex items-center">
+                <img src={logoImage} alt="Medina Precision Painting" className="h-28 w-auto" />
+              </a>
             </div>
             <nav className="hidden md:flex gap-2 ml-8">
               <a
@@ -2117,7 +2119,9 @@ function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
             <div>
-              <img src={logoImage} alt="Medina Precision Painting" className="h-16 w-auto brightness-0 invert mb-4" />
+              <a href="#/" aria-label="Go to home page" className="inline-flex items-center mb-4">
+                <img src={logoImage} alt="Medina Precision Painting" className="h-16 w-auto brightness-0 invert" />
+              </a>
               <p className="text-sm opacity-80 leading-relaxed mb-4">
                 Family-owned painting contractor serving Warner Robins and all of Georgia. Licensed, insured, and backed by a 2-year warranty.
               </p>
