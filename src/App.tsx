@@ -349,23 +349,118 @@ function App() {
 
   useEffect(() => {
     const checkOwner = async () => {
-      const user = await window.spark.user()
-      if (user) {
-        setIsOwner(user.isOwner)
+      try {
+        if (!window.spark?.user) return
+        const user = await window.spark.user()
+        if (user) {
+          setIsOwner(user.isOwner)
+        }
+      } catch {
+        // Non-Spark hosts (like GitHub Pages) do not expose this API.
       }
     }
     checkOwner()
   }, [])
 
-  // Email integration: works on any static host (incl. GitHub Pages).
-  // Strategy:
-  //   1. POST the quote to Formspree (React + fetch/AJAX) so it works on static
-  //      hosting like GitHub Pages without any backend server.
-  //   2. Always also open a pre-filled mailto: link as a guaranteed fallback,
-  //      so the visitor's mail client can send the lead even if the network
-  //      call fails.
-  const BUSINESS_EMAIL = 'azianninja1295@gmail.com'
-  const FORMSPREE_FORM_ID = 'mlgzkqek'
+  // Email integration for static hosts (including GitHub Pages).
+  // We try providers in order:
+  //   1) Formspree, 2) FormSubmit, 3) mailto fallback.
+  const ENV = (import.meta as unknown as { env: Record<string, string | undefined> }).env
+  const BUSINESS_EMAIL = ENV.VITE_BUSINESS_EMAIL || 'azianninja1295@gmail.com'
+  const FORMSPREE_QUOTE_FORM_ID = ENV.VITE_FORMSPREE_QUOTE_FORM_ID || ENV.VITE_FORMSPREE_ID || 'mlgzkqek'
+  const FORMSPREE_NEWSLETTER_FORM_ID = ENV.VITE_FORMSPREE_NEWSLETTER_FORM_ID || FORMSPREE_QUOTE_FORM_ID
+
+  type EmailDeliveryChannel = 'formspree' | 'formsubmit' | 'mailto' | 'failed'
+
+  const postToFormspree = async (
+    formId: string,
+    payload: Record<string, string | undefined>,
+  ): Promise<boolean> => {
+    if (!formId) return false
+    try {
+      const res = await fetch(`https://formspree.io/f/${formId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify(payload),
+      })
+      if (res.ok) return true
+      console.warn('Formspree responded with non-OK status', res.status)
+      return false
+    } catch (err) {
+      console.warn('Formspree submission failed:', err)
+      return false
+    }
+  }
+
+  const postToFormSubmit = async (
+    payload: Record<string, string | undefined>,
+  ): Promise<boolean> => {
+    try {
+      const res = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(BUSINESS_EMAIL)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          _captcha: 'false',
+          _template: 'table',
+          ...payload,
+        }),
+      })
+      if (!res.ok) {
+        console.warn('FormSubmit responded with non-OK status', res.status)
+        return false
+      }
+      return true
+    } catch (err) {
+      console.warn('FormSubmit submission failed:', err)
+      return false
+    }
+  }
+
+  const openMailtoFallback = (
+    subject: string,
+    body: string,
+  ): boolean => {
+    try {
+      const mailto = `mailto:${BUSINESS_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+      window.open(mailto, '_blank')
+      return true
+    } catch (err) {
+      console.error('mailto fallback failed:', err)
+      return false
+    }
+  }
+
+  const deliverEmail = async ({
+    formspreeId,
+    subject,
+    replyTo,
+    body,
+    fields,
+  }: {
+    formspreeId: string
+    subject: string
+    replyTo?: string
+    body: string
+    fields: Record<string, string | undefined>
+  }): Promise<EmailDeliveryChannel> => {
+    const formspreeOk = await postToFormspree(formspreeId, {
+      _subject: subject,
+      _replyto: replyTo,
+      message: body,
+      ...fields,
+    })
+    if (formspreeOk) return 'formspree'
+
+    const formSubmitOk = await postToFormSubmit({
+      _subject: subject,
+      _replyto: replyTo,
+      message: body,
+      ...fields,
+    })
+    if (formSubmitOk) return 'formsubmit'
+
+    return openMailtoFallback(subject, body) ? 'mailto' : 'failed'
+  }
 
   const buildEmailBody = (quote: QuoteRequest) => (
     `New quote request from ${quote.name}\n\n` +
@@ -384,56 +479,56 @@ function App() {
     `Description\n${quote.projectDescription || '(none)'}\n`
   )
 
-  const sendEmailNotification = async (quote: QuoteRequest) => {
+  const sendEmailNotification = async (quote: QuoteRequest): Promise<EmailDeliveryChannel> => {
     const subject = `New Quote Request from ${quote.name}`
     const body = buildEmailBody(quote)
 
-    // 1. Try Formspree first. VITE_FORMSPREE_ID can override the built-in id.
-    const formspreeId =
-      (import.meta as unknown as { env: Record<string, string | undefined> }).env.VITE_FORMSPREE_ID ||
-      FORMSPREE_FORM_ID
-    try {
-      const res = await fetch(`https://formspree.io/f/${formspreeId}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({
-          _subject: subject,
-          _replyto: quote.email,
-          name: quote.name,
-          email: quote.email,
-          phone: quote.phone,
-          address: quote.address,
-          serviceTypes: formatServices(getQuoteServices(quote)),
-          propertyType: quote.propertyType,
-          preferredDate: quote.preferredDate,
-          budgetRange: quote.budgetRange,
-          referralSource: quote.referralSource,
-          projectDescription: quote.projectDescription,
-          submittedAt: quote.submittedAt,
-          message: body,
-        }),
-      })
-      if (res.ok) {
-        toast.success('Email sent to Medina Precision Painting.')
-        return
-      }
-      console.warn('Formspree responded with non-OK status', res.status)
-    } catch (err) {
-      console.warn('Formspree submission failed, falling back to mailto:', err)
-    }
+    return deliverEmail({
+      formspreeId: FORMSPREE_QUOTE_FORM_ID,
+      subject,
+      replyTo: quote.email,
+      body,
+      fields: {
+        name: quote.name,
+        email: quote.email,
+        phone: quote.phone,
+        address: quote.address,
+        serviceTypes: formatServices(getQuoteServices(quote)),
+        propertyType: quote.propertyType,
+        preferredDate: quote.preferredDate,
+        budgetRange: quote.budgetRange,
+        referralSource: quote.referralSource,
+        projectDescription: quote.projectDescription,
+        submittedAt: quote.submittedAt,
+      },
+    })
+  }
 
-    // 2. Mailto fallback — opens the visitor's mail client with a pre-filled
-    //    message so the lead can still be delivered without any backend.
-    try {
-      const mailto = `mailto:${BUSINESS_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
-      window.open(mailto, '_blank')
-      toast.info('Opening your email app to send the quote request', {
-        description: 'If nothing opens, please email us at ' + BUSINESS_EMAIL,
-      })
-    } catch (err) {
-      console.error('mailto fallback failed:', err)
-      toast.error('Could not send email. Please call (478) 955-2341.')
-    }
+  const sendNewsletterNotification = async (
+    email: string,
+    subscribedAtIso: string,
+  ): Promise<EmailDeliveryChannel> => {
+    const subject = `New Newsletter Subscriber: ${email}`
+    const body = [
+      'New newsletter subscriber',
+      '',
+      `Email: ${email}`,
+      `Subscribed: ${new Date(subscribedAtIso).toLocaleString()}`,
+      '',
+      'Source: Website footer form',
+    ].join('\n')
+
+    return deliverEmail({
+      formspreeId: FORMSPREE_NEWSLETTER_FORM_ID,
+      subject,
+      replyTo: email,
+      body,
+      fields: {
+        email,
+        subscribedAt: subscribedAtIso,
+        source: 'website-newsletter-footer',
+      },
+    })
   }
 
   // Every entry point to the quote form (header button, hero CTA, floating
@@ -473,9 +568,18 @@ function App() {
 
     setQuotes(currentQuotes => [newQuote, ...(currentQuotes || [])])
 
-    await sendEmailNotification(newQuote)
+    const channel = await sendEmailNotification(newQuote)
 
-    toast.success('Quote request submitted! We\'ll contact you within 24 hours.')
+    if (channel === 'formspree' || channel === 'formsubmit') {
+      toast.success('Quote request submitted! We\'ll contact you within 24 hours.')
+    } else if (channel === 'mailto') {
+      toast.info('Quote request saved. Please send the pre-filled email that opened.', {
+        description: `If nothing opens, email us at ${BUSINESS_EMAIL}.`,
+      })
+    } else {
+      toast.error('Quote saved, but email delivery failed. Please call (478) 955-2341.')
+    }
+
     setIsDialogOpen(false)
     setFormData(BLANK_QUOTE_FORM)
   }
@@ -558,22 +662,42 @@ function App() {
     toast.success(`Exported ${rows.length} quote${rows.length === 1 ? '' : 's'}`)
   }
 
-  const handleNewsletterSubmit = (e: React.FormEvent) => {
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     const email = newsletterEmail.trim().toLowerCase()
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       toast.error('Please enter a valid email address')
       return
     }
+
+    const subscribedAt = new Date().toISOString()
+    let isDuplicate = false
+
     setSubscribers(current => {
       const list = current || []
       if (list.some(s => s.email === email)) {
-        toast.info("You're already subscribed!")
+        isDuplicate = true
         return list
       }
-      toast.success('Thanks for subscribing! Painting tips on the way.')
-      return [{ email, subscribedAt: new Date().toISOString() }, ...list]
+      return [{ email, subscribedAt }, ...list]
     })
+
+    if (isDuplicate) {
+      toast.info("You're already subscribed!")
+      return
+    }
+
+    const channel = await sendNewsletterNotification(email, subscribedAt)
+    if (channel === 'formspree' || channel === 'formsubmit') {
+      toast.success('Thanks for subscribing! You\'re on the list.')
+    } else if (channel === 'mailto') {
+      toast.info('Subscription saved. Please send the pre-filled email that opened.', {
+        description: `If nothing opens, email us at ${BUSINESS_EMAIL}.`,
+      })
+    } else {
+      toast.error('Subscription saved, but email delivery failed right now.')
+    }
+
     setNewsletterEmail('')
   }
 
