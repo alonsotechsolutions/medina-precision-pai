@@ -110,6 +110,7 @@ function App() {
   const [servicesIndex, setServicesIndex] = useState(0)
   const [galleryIndex, setGalleryIndex] = useState(0)
   const [testimonialsIndex, setTestimonialsIndex] = useState(0)
+  const [palettesIndex, setPalettesIndex] = useState(0)
   
   const scrollServicesNext = useCallback(() => servicesEmblaApi?.scrollNext(), [servicesEmblaApi])
   const scrollServicesPrev = useCallback(() => servicesEmblaApi?.scrollPrev(), [servicesEmblaApi])
@@ -117,6 +118,8 @@ function App() {
   const scrollGalleryPrev = useCallback(() => galleryEmblaApi?.scrollPrev(), [galleryEmblaApi])
   const scrollTestimonialsNext = useCallback(() => testimonialsEmblaApi?.scrollNext(), [testimonialsEmblaApi])
   const scrollTestimonialsPrev = useCallback(() => testimonialsEmblaApi?.scrollPrev(), [testimonialsEmblaApi])
+  const scrollPalettesNext = useCallback(() => palettesEmblaApi?.scrollNext(), [palettesEmblaApi])
+  const scrollPalettesPrev = useCallback(() => palettesEmblaApi?.scrollPrev(), [palettesEmblaApi])
   
   useEffect(() => {
     if (!servicesEmblaApi) return
@@ -141,6 +144,14 @@ function App() {
     onSelect()
     return () => { testimonialsEmblaApi.off('select', onSelect) }
   }, [testimonialsEmblaApi])
+
+  useEffect(() => {
+    if (!palettesEmblaApi) return
+    const onSelect = () => setPalettesIndex(palettesEmblaApi.selectedScrollSnap())
+    palettesEmblaApi.on('select', onSelect)
+    onSelect()
+    return () => { palettesEmblaApi.off('select', onSelect) }
+  }, [palettesEmblaApi])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -1718,83 +1729,103 @@ function App() {
               </p>
             </motion.div>
 
-            {/* Mobile carousel */}
-            <div className="block sm:hidden">
-              <div className="overflow-hidden" ref={palettesEmblaRef}>
-                <div className="flex gap-4 px-1">
-                  {colorPalettes.map((palette, index) => {
-                    const openWithPalette = () => {
-                      const paletteLine = `Inspired by palette: ${palette.name} (${palette.mood}) — Colors: ${palette.colors.join(', ')}`
-                      setFormData(prev => {
-                        const existing = (prev.projectDescription || '').trim()
-                        const alreadyHasPalette = existing.includes('Inspired by palette:')
-                        const nextDescription = alreadyHasPalette
-                          ? existing.replace(/Inspired by palette:.*$/m, paletteLine)
-                          : existing
-                            ? `${existing}\n\n${paletteLine}`
-                            : paletteLine
-                        return { ...prev, projectDescription: nextDescription }
-                      })
-                      setIsDialogOpen(true)
-                    }
-                    return (
-                      <motion.div
-                        key={index}
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: index * 0.05 }}
-                        className="min-w-[85vw] max-w-xs"
-                      >
-                        <Card
-                          role="button"
-                          tabIndex={0}
-                          onClick={openWithPalette}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                              e.preventDefault()
-                              openWithPalette()
-                            }
-                          }}
-                          aria-label={`Request a free quote inspired by the ${palette.name} palette`}
-                          className="overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-                        >
-                          <div className="flex h-32">
-                            {palette.colors.map((color, idx) => (
-                              <div
-                                key={idx}
-                                className="flex-1 transition-all duration-300 hover:flex-[1.5]"
-                                style={{ backgroundColor: color }}
-                                title={color}
-                                aria-label={`Color swatch ${color}`}
-                              />
-                            ))}
-                          </div>
-                          <CardContent className="p-5">
-                            <div className="flex items-start justify-between gap-3 mb-2">
-                              <h3 className="font-semibold text-lg">{palette.name}</h3>
-                              <Lightbulb size={20} weight="duotone" className="text-accent shrink-0" />
-                            </div>
-                            <p className="text-sm text-muted-foreground mb-3">{palette.mood}</p>
-                            <div className="flex flex-wrap gap-1.5">
+            {isMobile ? (
+              <div className="relative">
+                <div className="overflow-hidden" ref={palettesEmblaRef}>
+                  <div className="flex">
+                    {colorPalettes.map((palette, index) => {
+                      const openWithPalette = () => {
+                        const paletteLine = `Inspired by palette: ${palette.name} (${palette.mood}) — Colors: ${palette.colors.join(', ')}`
+                        setFormData(prev => {
+                          const existing = (prev.projectDescription || '').trim()
+                          const alreadyHasPalette = existing.includes('Inspired by palette:')
+                          const nextDescription = alreadyHasPalette
+                            ? existing.replace(/Inspired by palette:.*$/m, paletteLine)
+                            : existing
+                              ? `${existing}\n\n${paletteLine}`
+                              : paletteLine
+                          return { ...prev, projectDescription: nextDescription }
+                        })
+                        setIsDialogOpen(true)
+                      }
+                      return (
+                        <div key={index} className="flex-[0_0_100%] min-w-0">
+                          <Card
+                            role="button"
+                            tabIndex={0}
+                            onClick={openWithPalette}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault()
+                                openWithPalette()
+                              }
+                            }}
+                            aria-label={`Request a free quote inspired by the ${palette.name} palette`}
+                            className="overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary mx-2"
+                          >
+                            <div className="flex h-32">
                               {palette.colors.map((color, idx) => (
-                                <code key={idx} className="text-xs bg-muted px-2 py-0.5 rounded">{color}</code>
+                                <div
+                                  key={idx}
+                                  className="flex-1 transition-all duration-300 hover:flex-[1.5]"
+                                  style={{ backgroundColor: color }}
+                                  title={color}
+                                  aria-label={`Color swatch ${color}`}
+                                />
                               ))}
                             </div>
-                            <p className="text-xs text-primary mt-3 font-medium">
-                              Tap to request a free quote with this palette →
-                            </p>
-                          </CardContent>
-                        </Card>
-                      </motion.div>
-                    )
-                  })}
+                            <CardContent className="p-5">
+                              <div className="flex items-start justify-between gap-3 mb-2">
+                                <h3 className="font-semibold text-lg">{palette.name}</h3>
+                                <Lightbulb size={20} weight="duotone" className="text-accent shrink-0" />
+                              </div>
+                              <p className="text-sm text-muted-foreground mb-3">{palette.mood}</p>
+                              <div className="flex flex-wrap gap-1.5">
+                                {palette.colors.map((color, idx) => (
+                                  <code key={idx} className="text-xs bg-muted px-2 py-0.5 rounded">{color}</code>
+                                ))}
+                              </div>
+                              <p className="text-xs text-primary mt-3 font-medium">
+                                Tap to request a free quote with this palette →
+                              </p>
+                            </CardContent>
+                          </Card>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+                <div className="flex items-center justify-center gap-4 mt-6">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={scrollPalettesPrev}
+                    className="rounded-full"
+                  >
+                    <CaretLeft size={20} weight="bold" />
+                  </Button>
+                  <div className="flex gap-1.5">
+                    {colorPalettes.map((_, index) => (
+                      <div
+                        key={index}
+                        className={`h-2 rounded-full transition-all duration-300 ${
+                          index === palettesIndex ? 'w-8 bg-primary' : 'w-2 bg-border'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={scrollPalettesNext}
+                    className="rounded-full"
+                  >
+                    <CaretRight size={20} weight="bold" />
+                  </Button>
                 </div>
               </div>
-            </div>
-
-            {/* Desktop grid */}
-            <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            ) : (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {colorPalettes.map((palette, index) => {
                 const openWithPalette = () => {
                   const paletteLine = `Inspired by palette: ${palette.name} (${palette.mood}) — Colors: ${palette.colors.join(', ')}`
@@ -1862,10 +1893,9 @@ function App() {
                 )
               })}
             </div>
+            )}
           </div>
         </section>
-
-        {/* Warranty & Guarantee */}
         <section id="warranty" data-page="about" className="py-20 bg-muted/30">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <Card className="overflow-hidden">
