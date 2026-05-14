@@ -853,7 +853,12 @@ function App() {
           <div className="flex items-center justify-between h-32">
             <div className="flex items-center">
               <a href="#/" aria-label="Go to home page" className="inline-flex items-center">
-                <img src={logoImage} alt="Medina Precision Painting" className="h-28 w-auto" />
+                <img
+                  src={logoImage}
+                  alt="Medina Precision Painting"
+                  className="w-auto"
+                  style={{ height: 'calc(var(--spacing) * 70)' }}
+                />
               </a>
             </div>
             <nav className="hidden md:flex gap-2 ml-8">
