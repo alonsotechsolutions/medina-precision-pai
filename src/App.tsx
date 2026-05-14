@@ -105,6 +105,7 @@ function App() {
   const [servicesEmblaRef, servicesEmblaApi] = useEmblaCarousel({ loop: true })
   const [galleryEmblaRef, galleryEmblaApi] = useEmblaCarousel({ loop: true })
   const [testimonialsEmblaRef, testimonialsEmblaApi] = useEmblaCarousel({ loop: true })
+  const [palettesEmblaRef, palettesEmblaApi] = useEmblaCarousel({ loop: true, dragFree: true })
   
   const [servicesIndex, setServicesIndex] = useState(0)
   const [galleryIndex, setGalleryIndex] = useState(0)
@@ -1716,7 +1717,84 @@ function App() {
                 Browse curated palettes to find your style. We'll help you fine-tune the perfect shades during your free color consultation.
               </p>
             </motion.div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+            {/* Mobile carousel */}
+            <div className="block sm:hidden">
+              <div className="overflow-hidden" ref={palettesEmblaRef}>
+                <div className="flex gap-4 px-1">
+                  {colorPalettes.map((palette, index) => {
+                    const openWithPalette = () => {
+                      const paletteLine = `Inspired by palette: ${palette.name} (${palette.mood}) — Colors: ${palette.colors.join(', ')}`
+                      setFormData(prev => {
+                        const existing = (prev.projectDescription || '').trim()
+                        const alreadyHasPalette = existing.includes('Inspired by palette:')
+                        const nextDescription = alreadyHasPalette
+                          ? existing.replace(/Inspired by palette:.*$/m, paletteLine)
+                          : existing
+                            ? `${existing}\n\n${paletteLine}`
+                            : paletteLine
+                        return { ...prev, projectDescription: nextDescription }
+                      })
+                      setIsDialogOpen(true)
+                    }
+                    return (
+                      <motion.div
+                        key={index}
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: index * 0.05 }}
+                        className="min-w-[85vw] max-w-xs"
+                      >
+                        <Card
+                          role="button"
+                          tabIndex={0}
+                          onClick={openWithPalette}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault()
+                              openWithPalette()
+                            }
+                          }}
+                          aria-label={`Request a free quote inspired by the ${palette.name} palette`}
+                          className="overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                        >
+                          <div className="flex h-32">
+                            {palette.colors.map((color, idx) => (
+                              <div
+                                key={idx}
+                                className="flex-1 transition-all duration-300 hover:flex-[1.5]"
+                                style={{ backgroundColor: color }}
+                                title={color}
+                                aria-label={`Color swatch ${color}`}
+                              />
+                            ))}
+                          </div>
+                          <CardContent className="p-5">
+                            <div className="flex items-start justify-between gap-3 mb-2">
+                              <h3 className="font-semibold text-lg">{palette.name}</h3>
+                              <Lightbulb size={20} weight="duotone" className="text-accent shrink-0" />
+                            </div>
+                            <p className="text-sm text-muted-foreground mb-3">{palette.mood}</p>
+                            <div className="flex flex-wrap gap-1.5">
+                              {palette.colors.map((color, idx) => (
+                                <code key={idx} className="text-xs bg-muted px-2 py-0.5 rounded">{color}</code>
+                              ))}
+                            </div>
+                            <p className="text-xs text-primary mt-3 font-medium">
+                              Tap to request a free quote with this palette →
+                            </p>
+                          </CardContent>
+                        </Card>
+                      </motion.div>
+                    )
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* Desktop grid */}
+            <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {colorPalettes.map((palette, index) => {
                 const openWithPalette = () => {
                   const paletteLine = `Inspired by palette: ${palette.name} (${palette.mood}) — Colors: ${palette.colors.join(', ')}`
@@ -1733,54 +1811,54 @@ function App() {
                   setIsDialogOpen(true)
                 }
                 return (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.05 }}
-                >
-                  <Card
-                    role="button"
-                    tabIndex={0}
-                    onClick={openWithPalette}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault()
-                        openWithPalette()
-                      }
-                    }}
-                    aria-label={`Request a free quote inspired by the ${palette.name} palette`}
-                    className="overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.05 }}
                   >
-                    <div className="flex h-32">
-                      {palette.colors.map((color, idx) => (
-                        <div
-                          key={idx}
-                          className="flex-1 transition-all duration-300 hover:flex-[1.5]"
-                          style={{ backgroundColor: color }}
-                          title={color}
-                          aria-label={`Color swatch ${color}`}
-                        />
-                      ))}
-                    </div>
-                    <CardContent className="p-5">
-                      <div className="flex items-start justify-between gap-3 mb-2">
-                        <h3 className="font-semibold text-lg">{palette.name}</h3>
-                        <Lightbulb size={20} weight="duotone" className="text-accent shrink-0" />
-                      </div>
-                      <p className="text-sm text-muted-foreground mb-3">{palette.mood}</p>
-                      <div className="flex flex-wrap gap-1.5">
+                    <Card
+                      role="button"
+                      tabIndex={0}
+                      onClick={openWithPalette}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault()
+                          openWithPalette()
+                        }
+                      }}
+                      aria-label={`Request a free quote inspired by the ${palette.name} palette`}
+                      className="overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                    >
+                      <div className="flex h-32">
                         {palette.colors.map((color, idx) => (
-                          <code key={idx} className="text-xs bg-muted px-2 py-0.5 rounded">{color}</code>
+                          <div
+                            key={idx}
+                            className="flex-1 transition-all duration-300 hover:flex-[1.5]"
+                            style={{ backgroundColor: color }}
+                            title={color}
+                            aria-label={`Color swatch ${color}`}
+                          />
                         ))}
                       </div>
-                      <p className="text-xs text-primary mt-3 font-medium">
-                        Click to request a free quote with this palette →
-                      </p>
-                    </CardContent>
-                  </Card>
-                </motion.div>
+                      <CardContent className="p-5">
+                        <div className="flex items-start justify-between gap-3 mb-2">
+                          <h3 className="font-semibold text-lg">{palette.name}</h3>
+                          <Lightbulb size={20} weight="duotone" className="text-accent shrink-0" />
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-3">{palette.mood}</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {palette.colors.map((color, idx) => (
+                            <code key={idx} className="text-xs bg-muted px-2 py-0.5 rounded">{color}</code>
+                          ))}
+                        </div>
+                        <p className="text-xs text-primary mt-3 font-medium">
+                          Click to request a free quote with this palette →
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
                 )
               })}
             </div>
