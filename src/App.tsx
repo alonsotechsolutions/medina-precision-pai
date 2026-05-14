@@ -71,6 +71,103 @@ interface QuoteRequest {
   submittedAt: string
 }
 
+// ----------------------- Paint Cost Estimator config -----------------------
+// Project types match the service-type values in the quote form so the
+// estimator can prefill the quote dialog directly.
+type ProjectType =
+  | 'interior'
+  | 'exterior'
+  | 'cabinets'
+  | 'commercial'
+  | 'pressure-washing'
+  | 'drywall-repair'
+  | 'deck-fence-staining'
+  | 'popcorn-ceiling'
+
+type QualityLevel = 'standard' | 'premium' | 'luxury'
+
+interface ProjectConfig {
+  label: string
+  shortLabel: string
+  baseRate: number          // $ per unit (sqft / door / patch)
+  unitLabel: string         // slider label
+  unitSuffix: string        // shown next to live value
+  sliderMin: number
+  sliderMax: number
+  sliderStep: number
+  defaultValue: number
+  tip: string
+  showRooms: boolean
+  showQuality: boolean
+  roomsLabel?: string
+}
+
+// 2024–2025 Central-Georgia market averages for labor + materials.
+const PROJECT_CONFIG: Record<ProjectType, ProjectConfig> = {
+  interior: {
+    label: 'Interior Painting', shortLabel: 'Interior',
+    baseRate: 3.50, unitLabel: 'Approximate Square Footage', unitSuffix: 'sq ft',
+    sliderMin: 100, sliderMax: 5000, sliderStep: 50, defaultValue: 1200,
+    tip: 'Avg bedroom ≈ 150 sq ft. Whole-home interiors ≈ 1,500–2,500 sq ft.',
+    showRooms: true, showQuality: true, roomsLabel: 'Number of Rooms',
+  },
+  exterior: {
+    label: 'Exterior Painting', shortLabel: 'Exterior',
+    baseRate: 3.75, unitLabel: 'Exterior Wall Square Footage', unitSuffix: 'sq ft',
+    sliderMin: 500, sliderMax: 8000, sliderStep: 100, defaultValue: 2200,
+    tip: 'A 1-story 2,000 sq ft home has ≈ 2,000–2,500 sq ft of exterior wall.',
+    showRooms: false, showQuality: true,
+  },
+  cabinets: {
+    label: 'Cabinet Refinishing', shortLabel: 'Cabinets',
+    baseRate: 95, unitLabel: 'Cabinet Doors & Drawer Fronts', unitSuffix: 'pieces',
+    sliderMin: 5, sliderMax: 60, sliderStep: 1, defaultValue: 22,
+    tip: 'Count every door and drawer front. Average kitchen ≈ 20–30 pieces.',
+    showRooms: false, showQuality: true,
+  },
+  commercial: {
+    label: 'Commercial Painting', shortLabel: 'Commercial',
+    baseRate: 2.75, unitLabel: 'Paintable Square Footage', unitSuffix: 'sq ft',
+    sliderMin: 500, sliderMax: 20000, sliderStep: 250, defaultValue: 4000,
+    tip: 'Total wall + ceiling area for office, retail, or warehouse spaces.',
+    showRooms: true, showQuality: true, roomsLabel: 'Number of Rooms / Areas',
+  },
+  'pressure-washing': {
+    label: 'Pressure Washing', shortLabel: 'Pressure Wash',
+    baseRate: 0.30, unitLabel: 'Surface Square Footage', unitSuffix: 'sq ft',
+    sliderMin: 200, sliderMax: 6000, sliderStep: 100, defaultValue: 1500,
+    tip: 'Driveways, siding, decks — total area to be washed.',
+    showRooms: false, showQuality: false,
+  },
+  'drywall-repair': {
+    label: 'Drywall & Repair', shortLabel: 'Drywall',
+    baseRate: 75, unitLabel: 'Number of Patches / Repairs', unitSuffix: 'patches',
+    sliderMin: 1, sliderMax: 30, sliderStep: 1, defaultValue: 4,
+    tip: 'Holes, dents, popped nails, water damage — each repair counts as one patch.',
+    showRooms: false, showQuality: false,
+  },
+  'deck-fence-staining': {
+    label: 'Deck & Fence Staining', shortLabel: 'Deck / Fence',
+    baseRate: 3.00, unitLabel: 'Surface Square Footage', unitSuffix: 'sq ft',
+    sliderMin: 100, sliderMax: 3000, sliderStep: 50, defaultValue: 400,
+    tip: 'A 12×16 ft deck ≈ 200 sq ft. For fences, multiply length × height.',
+    showRooms: false, showQuality: true,
+  },
+  'popcorn-ceiling': {
+    label: 'Popcorn Ceiling Removal', shortLabel: 'Popcorn',
+    baseRate: 2.00, unitLabel: 'Ceiling Square Footage', unitSuffix: 'sq ft',
+    sliderMin: 100, sliderMax: 3000, sliderStep: 50, defaultValue: 600,
+    tip: 'Roughly equal to the floor area of the rooms being treated.',
+    showRooms: true, showQuality: false, roomsLabel: 'Number of Rooms',
+  },
+}
+
+const QUALITY_OPTIONS: { value: QualityLevel; label: string; subtitle: string; multiplier: number }[] = [
+  { value: 'standard', label: 'Standard', subtitle: 'Behr Premium Plus, Valspar 4000', multiplier: 1.0 },
+  { value: 'premium',  label: 'Premium',  subtitle: 'S-W SuperPaint, BM Regal Select', multiplier: 1.25 },
+  { value: 'luxury',   label: 'Luxury',   subtitle: 'S-W Emerald, BM Aura',            multiplier: 1.6 },
+]
+
 function App() {
   const [formData, setFormData] = useState({
     name: '',
@@ -97,10 +194,16 @@ function App() {
   const [newsletterEmail, setNewsletterEmail] = useState('')
 
   // Paint cost estimator state
-  const [calcSqFt, setCalcSqFt] = useState<number>(1200)
+  const [calcProject, setCalcProject] = useState<ProjectType>('interior')
+  const [calcQuantity, setCalcQuantity] = useState<number>(PROJECT_CONFIG.interior.defaultValue)
   const [calcRooms, setCalcRooms] = useState<number>(3)
-  const [calcQuality, setCalcQuality] = useState<'standard' | 'premium' | 'luxury'>('premium')
-  const [calcProject, setCalcProject] = useState<'interior' | 'exterior' | 'cabinets'>('interior')
+  const [calcQuality, setCalcQuality] = useState<QualityLevel>('premium')
+
+  // Reset quantity to a sensible default whenever the project type changes,
+  // because units differ (sq ft vs doors vs patches).
+  useEffect(() => {
+    setCalcQuantity(PROJECT_CONFIG[calcProject].defaultValue)
+  }, [calcProject])
   
   const [servicesEmblaRef, servicesEmblaApi] = useEmblaCarousel({ loop: true })
   const [galleryEmblaRef, galleryEmblaApi] = useEmblaCarousel({ loop: true })
@@ -426,29 +529,48 @@ function App() {
   // Paint cost estimator — transparent rough-range calculation.
   // Disclaimer: provides a "starting estimate" only; final pricing requires an on-site visit.
   const calculateEstimate = () => {
-    // Base rate in USD per square foot of paintable area, based on 2024 Central-Georgia
-    // market averages for labor + standard materials. Update annually as paint and labor
-    // costs change. Cabinets are higher because they require disassembly, sanding,
-    // priming, and multiple spray coats.
-    const baseRate: Record<typeof calcProject, number> = {
-      interior: 2.5,  // $/sq ft
-      exterior: 3.25, // $/sq ft
-      cabinets: 9.0   // $/sq ft (door + frame surface)
-    }
-    // Quality multiplier reflecting paint grade and prep
-    const qualityMultiplier: Record<typeof calcQuality, number> = {
-      standard: 1.0,
-      premium: 1.25,
-      luxury: 1.6
-    }
-    // Small-project floor: extra rooms add minor trim/prep overhead
-    const roomAdj = 1 + Math.max(0, calcRooms - 1) * 0.04
-    const center = calcSqFt * baseRate[calcProject] * qualityMultiplier[calcQuality] * roomAdj
-    const low = Math.max(250, Math.round(center * 0.85 / 25) * 25)
+    const cfg = PROJECT_CONFIG[calcProject]
+    const qualityMult = cfg.showQuality
+      ? (QUALITY_OPTIONS.find(q => q.value === calcQuality)?.multiplier ?? 1)
+      : 1
+    const roomAdj = cfg.showRooms ? 1 + Math.max(0, calcRooms - 1) * 0.04 : 1
+    const center = calcQuantity * cfg.baseRate * qualityMult * roomAdj
+    const low = Math.max(150, Math.round(center * 0.85 / 25) * 25)
     const high = Math.max(low + 100, Math.round(center * 1.15 / 25) * 25)
     return { low, high }
   }
   const estimate = calculateEstimate()
+
+  // Build a human-readable estimator summary that gets attached to the quote
+  // form (and therefore emailed/saved with the lead) when the user clicks
+  // "Get My Exact Price".
+  const buildEstimatorSummary = () => {
+    const cfg = PROJECT_CONFIG[calcProject]
+    const lines = [
+      '--- Instant Estimator Result ---',
+      `Project: ${cfg.label}`,
+      `${cfg.unitLabel}: ${calcQuantity.toLocaleString()} ${cfg.unitSuffix}`,
+    ]
+    if (cfg.showRooms) lines.push(`${cfg.roomsLabel}: ${calcRooms}`)
+    if (cfg.showQuality) {
+      const q = QUALITY_OPTIONS.find(o => o.value === calcQuality)
+      lines.push(`Paint Quality: ${q?.label} (${q?.subtitle})`)
+    }
+    lines.push(`Estimated Range: $${estimate.low.toLocaleString()} – $${estimate.high.toLocaleString()}`)
+    return lines.join('\n')
+  }
+
+  const handleGetExactPrice = () => {
+    const summary = buildEstimatorSummary()
+    setFormData(prev => ({
+      ...prev,
+      serviceType: prev.serviceType || calcProject,
+      projectDescription: prev.projectDescription
+        ? `${prev.projectDescription}\n\n${summary}`
+        : summary,
+    }))
+    setIsDialogOpen(true)
+  }
 
   const stats = [
     { value: '5+', label: 'Years of Experience', icon: Medal },
@@ -1633,75 +1755,76 @@ function App() {
                   <div className="space-y-6">
                     <div>
                       <Label className="mb-3 block">Project Type</Label>
-                      <div className="grid grid-cols-3 gap-2">
-                        {([
-                          { value: 'interior', label: 'Interior' },
-                          { value: 'exterior', label: 'Exterior' },
-                          { value: 'cabinets', label: 'Cabinets' }
-                        ] as const).map(opt => (
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        {(Object.entries(PROJECT_CONFIG) as [ProjectType, ProjectConfig][]).map(([key, cfg]) => (
                           <Button
-                            key={opt.value}
+                            key={key}
                             type="button"
-                            variant={calcProject === opt.value ? 'default' : 'outline'}
-                            onClick={() => setCalcProject(opt.value)}
-                            className="w-full"
+                            variant={calcProject === key ? 'default' : 'outline'}
+                            onClick={() => setCalcProject(key)}
+                            className="w-full text-xs sm:text-sm h-auto py-2 px-2 whitespace-normal"
                           >
-                            {opt.label}
+                            {cfg.shortLabel}
                           </Button>
                         ))}
                       </div>
                     </div>
                     <div>
-                      <div className="flex items-center justify-between mb-3">
-                        <Label htmlFor="calc-sqft">Approx. Square Footage</Label>
-                        <span className="font-semibold text-primary">{calcSqFt.toLocaleString()} sq ft</span>
+                      <div className="flex items-center justify-between mb-3 gap-3">
+                        <Label htmlFor="calc-quantity">{PROJECT_CONFIG[calcProject].unitLabel}</Label>
+                        <span className="font-semibold text-primary shrink-0">
+                          {calcQuantity.toLocaleString()} {PROJECT_CONFIG[calcProject].unitSuffix}
+                        </span>
                       </div>
                       <Slider
-                        id="calc-sqft"
-                        value={[calcSqFt]}
-                        onValueChange={(v) => setCalcSqFt(v[0])}
-                        min={100}
-                        max={5000}
-                        step={50}
+                        id="calc-quantity"
+                        value={[calcQuantity]}
+                        onValueChange={(v) => setCalcQuantity(v[0])}
+                        min={PROJECT_CONFIG[calcProject].sliderMin}
+                        max={PROJECT_CONFIG[calcProject].sliderMax}
+                        step={PROJECT_CONFIG[calcProject].sliderStep}
                       />
                       <p className="text-xs text-muted-foreground mt-2">
-                        Tip: average bedroom ≈ 150 sq ft, average house interior ≈ 1,500–2,500 sq ft.
+                        {PROJECT_CONFIG[calcProject].tip}
                       </p>
                     </div>
-                    <div>
-                      <div className="flex items-center justify-between mb-3">
-                        <Label htmlFor="calc-rooms">Number of Rooms / Sections</Label>
-                        <span className="font-semibold text-primary">{calcRooms}</span>
+                    {PROJECT_CONFIG[calcProject].showRooms && (
+                      <div>
+                        <div className="flex items-center justify-between mb-3">
+                          <Label htmlFor="calc-rooms">{PROJECT_CONFIG[calcProject].roomsLabel}</Label>
+                          <span className="font-semibold text-primary">{calcRooms}</span>
+                        </div>
+                        <Slider
+                          id="calc-rooms"
+                          value={[calcRooms]}
+                          onValueChange={(v) => setCalcRooms(v[0])}
+                          min={1}
+                          max={15}
+                          step={1}
+                        />
                       </div>
-                      <Slider
-                        id="calc-rooms"
-                        value={[calcRooms]}
-                        onValueChange={(v) => setCalcRooms(v[0])}
-                        min={1}
-                        max={15}
-                        step={1}
-                      />
-                    </div>
-                    <div>
-                      <Label className="mb-3 block">Paint Quality</Label>
-                      <div className="grid grid-cols-3 gap-2">
-                        {([
-                          { value: 'standard', label: 'Standard' },
-                          { value: 'premium', label: 'Premium' },
-                          { value: 'luxury', label: 'Luxury' }
-                        ] as const).map(opt => (
-                          <Button
-                            key={opt.value}
-                            type="button"
-                            variant={calcQuality === opt.value ? 'default' : 'outline'}
-                            onClick={() => setCalcQuality(opt.value)}
-                            className="w-full"
-                          >
-                            {opt.label}
-                          </Button>
-                        ))}
+                    )}
+                    {PROJECT_CONFIG[calcProject].showQuality && (
+                      <div>
+                        <Label className="mb-3 block">Paint Quality</Label>
+                        <div className="grid grid-cols-3 gap-2">
+                          {QUALITY_OPTIONS.map(opt => (
+                            <Button
+                              key={opt.value}
+                              type="button"
+                              variant={calcQuality === opt.value ? 'default' : 'outline'}
+                              onClick={() => setCalcQuality(opt.value)}
+                              className="w-full h-auto py-2 px-2 flex flex-col gap-0.5 items-center"
+                            >
+                              <span className="font-semibold text-sm leading-tight">{opt.label}</span>
+                              <span className="text-[10px] opacity-75 leading-tight whitespace-normal text-center">
+                                {opt.subtitle}
+                              </span>
+                            </Button>
+                          ))}
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </div>
                   <div className="bg-primary text-primary-foreground rounded-xl p-6 sm:p-8 flex flex-col justify-between">
                     <div>
@@ -1713,18 +1836,18 @@ function App() {
                         ${estimate.low.toLocaleString()} – ${estimate.high.toLocaleString()}
                       </div>
                       <p className="text-sm text-primary-foreground/80 leading-relaxed mb-6">
-                        This range is a starting estimate based on industry averages for{' '}
-                        <strong>{calcQuality}</strong>-grade {calcProject} work. Final pricing depends on prep work, surface condition, and specific paint products — confirmed during your free on-site visit.
+                        Starting estimate for <strong>{PROJECT_CONFIG[calcProject].label}</strong>
+                        {PROJECT_CONFIG[calcProject].showQuality && <> at <strong>{calcQuality}</strong> grade</>}. Final pricing depends on prep work, surface condition, and specific paint products — confirmed during your free on-site visit.
                       </p>
                     </div>
-                    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                      <DialogTrigger asChild>
-                        <Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground w-full">
-                          <Calendar size={20} className="mr-2" />
-                          Get My Exact Price
-                        </Button>
-                      </DialogTrigger>
-                    </Dialog>
+                    <Button
+                      size="lg"
+                      onClick={handleGetExactPrice}
+                      className="bg-accent hover:bg-accent/90 text-accent-foreground w-full"
+                    >
+                      <Calendar size={20} className="mr-2" />
+                      Get My Exact Price
+                    </Button>
                   </div>
                 </div>
               </CardContent>
