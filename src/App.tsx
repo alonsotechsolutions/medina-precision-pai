@@ -51,7 +51,7 @@ import {
 } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 import { motion } from 'framer-motion'
-import { useKV } from '@github/spark/hooks'
+import { useLocalStorage } from '@/hooks/use-local-storage'
 import { useIsMobile } from '@/hooks/use-mobile'
 import useEmblaCarousel from 'embla-carousel-react'
 import logoImage from '@/assets/images/Logo.png'
@@ -235,8 +235,8 @@ function App() {
   const [quoteSearch, setQuoteSearch] = useState('')
   const isMobile = useIsMobile()
 
-  const [quotes, setQuotes] = useKV<QuoteRequest[]>('quote-requests', [])
-  const [subscribers, setSubscribers] = useKV<{ email: string; subscribedAt: string }[]>('newsletter-subscribers', [])
+  const [quotes, setQuotes] = useLocalStorage<QuoteRequest[]>('quote-requests', [])
+  const [subscribers, setSubscribers] = useLocalStorage<{ email: string; subscribedAt: string }[]>('newsletter-subscribers', [])
   const [newsletterEmail, setNewsletterEmail] = useState('')
 
   // Paint cost estimator state
