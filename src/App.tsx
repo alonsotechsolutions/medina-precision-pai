@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
@@ -61,7 +62,10 @@ interface QuoteRequest {
   email: string
   phone: string
   address: string
-  serviceType: string
+  /** One or more services the customer wants quoted. */
+  serviceTypes: string[]
+  /** @deprecated kept for backward-compat with quotes stored before multi-select was added. */
+  serviceType?: string
   propertyType: string
   projectDescription: string
   preferredDate?: string
@@ -69,6 +73,33 @@ interface QuoteRequest {
   referralSource?: string
   status: 'new' | 'contacted' | 'quoted' | 'completed'
   submittedAt: string
+}
+
+// Service options shown in the quote form. Values match the estimator's
+// ProjectType keys so the estimator can prefill the form directly.
+const SERVICE_OPTIONS: { value: string; label: string }[] = [
+  { value: 'interior',            label: 'Interior Painting' },
+  { value: 'exterior',            label: 'Exterior Painting' },
+  { value: 'cabinets',            label: 'Cabinet Refinishing' },
+  { value: 'commercial',          label: 'Commercial Painting' },
+  { value: 'pressure-washing',    label: 'Pressure Washing' },
+  { value: 'drywall-repair',      label: 'Drywall & Repair' },
+  { value: 'deck-fence-staining', label: 'Deck & Fence Staining' },
+  { value: 'popcorn-ceiling',     label: 'Popcorn Ceiling Removal' },
+  { value: 'other',               label: 'Other' },
+]
+
+const formatServices = (values: string[]): string =>
+  values
+    .map(v => SERVICE_OPTIONS.find(o => o.value === v)?.label ?? v)
+    .join(', ')
+
+// Normalizes legacy quotes (stored with a single `serviceType` string) into the
+// new `serviceTypes` array shape used everywhere else in the app.
+const getQuoteServices = (q: QuoteRequest): string[] => {
+  if (Array.isArray(q.serviceTypes) && q.serviceTypes.length > 0) return q.serviceTypes
+  if (q.serviceType) return [q.serviceType]
+  return []
 }
 
 // ----------------------- Paint Cost Estimator config -----------------------
@@ -168,20 +199,46 @@ const QUALITY_OPTIONS: { value: QualityLevel; label: string; subtitle: string; m
   { value: 'luxury',   label: 'Luxury',   subtitle: 'S-W Emerald, BM Aura',            multiplier: 1.6 },
 ]
 
+type QuoteFormData = {
+  name: string
+  email: string
+  phone: string
+  address: string
+  serviceTypes: string[]
+  propertyType: string
+  projectDescription: string
+  preferredDate: string
+  budgetRange: string
+  referralSource: string
+}
+
+const BLANK_QUOTE_FORM: QuoteFormData = {
+  name: '',
+  email: '',
+  phone: '',
+  address: '',
+  serviceTypes: [],
+  propertyType: '',
+  projectDescription: '',
+  preferredDate: '',
+  budgetRange: '',
+  referralSource: '',
+}
+
 function App() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    address: '',
-    serviceType: '',
-    propertyType: '',
-    projectDescription: '',
-    preferredDate: '',
-    budgetRange: '',
-    referralSource: ''
-  })
+  const [formData, setFormData] = useState<QuoteFormData>(BLANK_QUOTE_FORM)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+
+  // Every entry point to the quote form (header button, hero CTA, floating
+  // CTA, contact-section CTA, estimator "Get My Exact Price", and palette
+  // cards) opens the dialog through this helper. It guarantees the form
+  // always starts blank and is then prefilled with only the context for the
+  // specific entry point — preventing stale data (e.g. an estimator summary
+  // hanging around after the user backs out and clicks a palette).
+  const openQuoteForm = useCallback((prefill?: Partial<QuoteFormData>) => {
+    setFormData({ ...BLANK_QUOTE_FORM, ...(prefill ?? {}) })
+    setIsDialogOpen(true)
+  }, [])
   const [showFloatingCTA, setShowFloatingCTA] = useState(false)
   const [isOwner, setIsOwner] = useState(false)
   const [showAdminPanel, setShowAdminPanel] = useState(false)
@@ -330,7 +387,7 @@ function App() {
     `  Phone: ${quote.phone}\n` +
     `  Address: ${quote.address || 'Not provided'}\n\n` +
     `Project\n` +
-    `  Service: ${quote.serviceType}\n` +
+    `  Service: ${formatServices(getQuoteServices(quote)) || 'Not specified'}\n` +
     `  Property: ${quote.propertyType || 'Not specified'}\n` +
     `  Preferred date: ${quote.preferredDate || 'Not specified'}\n` +
     `  Budget: ${quote.budgetRange || 'Not specified'}\n` +
@@ -357,7 +414,7 @@ function App() {
           email: quote.email,
           phone: quote.phone,
           address: quote.address,
-          serviceType: quote.serviceType,
+          serviceTypes: formatServices(getQuoteServices(quote)),
           propertyType: quote.propertyType,
           preferredDate: quote.preferredDate,
           budgetRange: quote.budgetRange,
@@ -392,14 +449,19 @@ function App() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
+    if (formData.serviceTypes.length === 0) {
+      toast.error('Please select at least one service')
+      return
+    }
+
     const newQuote: QuoteRequest = {
       id: `quote-${Date.now()}`,
       name: formData.name,
       email: formData.email,
       phone: formData.phone,
       address: formData.address,
-      serviceType: formData.serviceType,
+      serviceTypes: formData.serviceTypes,
       propertyType: formData.propertyType,
       projectDescription: formData.projectDescription,
       preferredDate: formData.preferredDate,
@@ -408,25 +470,14 @@ function App() {
       status: 'new',
       submittedAt: new Date().toISOString()
     }
-    
+
     setQuotes(currentQuotes => [newQuote, ...(currentQuotes || [])])
-    
+
     await sendEmailNotification(newQuote)
-    
+
     toast.success('Quote request submitted! We\'ll contact you within 24 hours.')
     setIsDialogOpen(false)
-    setFormData({
-      name: '',
-      email: '',
-      phone: '',
-      address: '',
-      serviceType: '',
-      propertyType: '',
-      projectDescription: '',
-      preferredDate: '',
-      budgetRange: '',
-      referralSource: ''
-    })
+    setFormData(BLANK_QUOTE_FORM)
   }
 
   const updateQuoteStatus = (quoteId: string, newStatus: QuoteRequest['status']) => {
@@ -471,7 +522,7 @@ function App() {
       quote.email.toLowerCase().includes(q) ||
       quote.phone.toLowerCase().includes(q) ||
       (quote.address || '').toLowerCase().includes(q) ||
-      (quote.serviceType || '').toLowerCase().includes(q) ||
+      formatServices(getQuoteServices(quote)).toLowerCase().includes(q) ||
       (quote.projectDescription || '').toLowerCase().includes(q)
     )
   }
@@ -491,7 +542,7 @@ function App() {
       headers.join(','),
       ...rows.map(r => [
         new Date(r.submittedAt).toISOString(),
-        r.name, r.email, r.phone, r.address, r.serviceType, r.propertyType,
+        r.name, r.email, r.phone, r.address, formatServices(getQuoteServices(r)), r.propertyType,
         r.status, r.preferredDate, r.budgetRange, r.referralSource, r.projectDescription
       ].map(escape).join(','))
     ].join('\n')
@@ -561,15 +612,13 @@ function App() {
   }
 
   const handleGetExactPrice = () => {
-    const summary = buildEstimatorSummary()
-    setFormData(prev => ({
-      ...prev,
-      serviceType: prev.serviceType || calcProject,
-      projectDescription: prev.projectDescription
-        ? `${prev.projectDescription}\n\n${summary}`
-        : summary,
-    }))
-    setIsDialogOpen(true)
+    // Always open a fresh form pre-filled only with the estimator context.
+    // Selecting the matching service type for the user, but keeping it as an
+    // array so they can add more services (e.g. interior + cabinets).
+    openQuoteForm({
+      serviceTypes: [calcProject],
+      projectDescription: buildEstimatorSummary(),
+    })
   }
 
   const stats = [
@@ -1033,13 +1082,20 @@ function App() {
                   View Quotes ({(quotes || []).length})
                 </Button>
               )}
-              <a href="tel:4789552341" className="hidden sm:flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
+              <a
+                href="tel:4789552341"
+                aria-label="Call (478) 955-2341"
+                className="hidden sm:flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors whitespace-nowrap"
+              >
                 <Phone size={18} weight="bold" />
-                (478) 955-2341
+                <span className="hidden lg:inline">(478) 955-2341</span>
               </a>
               <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button className="bg-accent hover:bg-accent/90 text-accent-foreground">
+                  <Button
+                    onClick={() => openQuoteForm()}
+                    className="bg-accent hover:bg-accent/90 text-accent-foreground"
+                  >
                     Get Free Quote
                   </Button>
                 </DialogTrigger>
@@ -1068,21 +1124,37 @@ function App() {
                       <Input id="address" value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })} placeholder="123 Main St, Warner Robins, GA" />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="service-type">Service Type *</Label>
-                      <Select required value={formData.serviceType} onValueChange={(value) => setFormData({ ...formData, serviceType: value })}>
-                        <SelectTrigger id="service-type"><SelectValue placeholder="Select a service" /></SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="interior">Interior Painting</SelectItem>
-                          <SelectItem value="exterior">Exterior Painting</SelectItem>
-                          <SelectItem value="cabinets">Cabinet Refinishing</SelectItem>
-                          <SelectItem value="commercial">Commercial Painting</SelectItem>
-                          <SelectItem value="pressure-washing">Pressure Washing</SelectItem>
-                          <SelectItem value="drywall-repair">Drywall &amp; Repair</SelectItem>
-                          <SelectItem value="deck-fence-staining">Deck &amp; Fence Staining</SelectItem>
-                          <SelectItem value="popcorn-ceiling">Popcorn Ceiling Removal</SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <Label>Service Type *</Label>
+                      <p className="text-xs text-muted-foreground">
+                        Select all that apply.
+                      </p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                        {SERVICE_OPTIONS.map(opt => {
+                          const checked = formData.serviceTypes.includes(opt.value)
+                          const toggle = (next: boolean) => {
+                            setFormData(prev => ({
+                              ...prev,
+                              serviceTypes: next
+                                ? [...prev.serviceTypes, opt.value]
+                                : prev.serviceTypes.filter(v => v !== opt.value),
+                            }))
+                          }
+                          return (
+                            <label
+                              key={opt.value}
+                              htmlFor={`service-${opt.value}`}
+                              className={`flex items-center gap-2 rounded-md border p-2 text-sm cursor-pointer transition-colors ${checked ? 'border-primary bg-primary/5' : 'border-input hover:bg-muted/40'}`}
+                            >
+                              <Checkbox
+                                id={`service-${opt.value}`}
+                                checked={checked}
+                                onCheckedChange={(value) => toggle(value === true)}
+                              />
+                              <span>{opt.label}</span>
+                            </label>
+                          )
+                        })}
+                      </div>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="property-type">Property Type</Label>
@@ -1173,7 +1245,11 @@ function App() {
         >
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button size="lg" className="shadow-xl bg-accent hover:bg-accent/90 text-accent-foreground">
+              <Button
+                size="lg"
+                onClick={() => openQuoteForm()}
+                className="shadow-xl bg-accent hover:bg-accent/90 text-accent-foreground"
+              >
                 Get Free Quote
               </Button>
             </DialogTrigger>
@@ -1201,7 +1277,11 @@ function App() {
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                   <DialogTrigger asChild>
-                    <Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground text-lg px-8">
+                    <Button
+                      size="lg"
+                      onClick={() => openQuoteForm()}
+                      className="bg-accent hover:bg-accent/90 text-accent-foreground text-lg px-8"
+                    >
                       <Calendar size={24} className="mr-2" />
                       Get Free Estimate
                     </Button>
@@ -1878,18 +1958,11 @@ function App() {
                   <div className="flex">
                     {colorPalettes.map((palette, index) => {
                       const openWithPalette = () => {
+                        // Open a fresh form pre-filled only with the palette
+                        // info — no leftover state from a previous estimator
+                        // session.
                         const paletteLine = `Inspired by palette: ${palette.name} (${palette.mood}) — Colors: ${palette.colors.join(', ')}`
-                        setFormData(prev => {
-                          const existing = (prev.projectDescription || '').trim()
-                          const alreadyHasPalette = existing.includes('Inspired by palette:')
-                          const nextDescription = alreadyHasPalette
-                            ? existing.replace(/Inspired by palette:.*$/m, paletteLine)
-                            : existing
-                              ? `${existing}\n\n${paletteLine}`
-                              : paletteLine
-                          return { ...prev, projectDescription: nextDescription }
-                        })
-                        setIsDialogOpen(true)
+                        openQuoteForm({ projectDescription: paletteLine })
                       }
                       return (
                         <div key={index} className="flex-[0_0_100%] min-w-0">
@@ -1971,18 +2044,9 @@ function App() {
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {colorPalettes.map((palette, index) => {
                 const openWithPalette = () => {
+                  // Open a fresh form pre-filled only with the palette info.
                   const paletteLine = `Inspired by palette: ${palette.name} (${palette.mood}) — Colors: ${palette.colors.join(', ')}`
-                  setFormData(prev => {
-                    const existing = (prev.projectDescription || '').trim()
-                    const alreadyHasPalette = existing.includes('Inspired by palette:')
-                    const nextDescription = alreadyHasPalette
-                      ? existing.replace(/Inspired by palette:.*$/m, paletteLine)
-                      : existing
-                        ? `${existing}\n\n${paletteLine}`
-                        : paletteLine
-                    return { ...prev, projectDescription: nextDescription }
-                  })
-                  setIsDialogOpen(true)
+                  openQuoteForm({ projectDescription: paletteLine })
                 }
                 return (
                   <motion.div
@@ -2157,7 +2221,11 @@ function App() {
               </p>
               <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground">
+                  <Button
+                    size="lg"
+                    onClick={() => openQuoteForm()}
+                    className="bg-accent hover:bg-accent/90 text-accent-foreground"
+                  >
                     <Calendar size={20} className="mr-2" />
                     Schedule Free Estimate
                   </Button>
@@ -2378,7 +2446,7 @@ function App() {
                           <div>
                             <p className="text-sm font-semibold text-muted-foreground mb-1">Project Details</p>
                             <div className="space-y-1 text-sm">
-                              <p><span className="font-medium">Service:</span> {quote.serviceType}</p>
+                              <p><span className="font-medium">Service:</span> {formatServices(getQuoteServices(quote)) || 'Not specified'}</p>
                               {quote.propertyType && (
                                 <p><span className="font-medium">Property:</span> {quote.propertyType}</p>
                               )}
@@ -2498,7 +2566,7 @@ function App() {
                 )}
                 <div>
                   <Label>Service Type</Label>
-                  <p className="text-sm text-foreground mt-1">{selectedQuote.serviceType}</p>
+                  <p className="text-sm text-foreground mt-1">{formatServices(getQuoteServices(selectedQuote)) || 'Not specified'}</p>
                 </div>
                 {selectedQuote.propertyType && (
                   <div>
