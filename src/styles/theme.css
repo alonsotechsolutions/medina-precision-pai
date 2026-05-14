@@ -260,3 +260,9 @@
     --color-bg-overlay: var(--color-neutral-3);
   }
 }
+
+@layer utilities {
+  .h-28 {
+    height: calc(var(--spacing) * 70);
+  }
+}
