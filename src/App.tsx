@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -474,7 +474,7 @@ function App() {
     }
   ]
 
-  const colorPalettes = [
+  const baseColorPalettes = [
     {
       name: 'Coastal Calm',
       mood: 'Serene & Airy',
@@ -506,6 +506,104 @@ function App() {
       colors: ['#FFF5EC', '#F0C6A0', '#D27D5B', '#6E2A1E']
     }
   ]
+
+  const clampChannel = (value: number) => Math.max(0, Math.min(255, value))
+  const randomInt = (min: number, max: number) =>
+    Math.floor(Math.random() * (max - min + 1)) + min
+
+  const shiftHexColor = (hexColor: string, variance = 18) => {
+    const cleaned = hexColor.replace('#', '')
+    const r = parseInt(cleaned.slice(0, 2), 16)
+    const g = parseInt(cleaned.slice(2, 4), 16)
+    const b = parseInt(cleaned.slice(4, 6), 16)
+
+    const nr = clampChannel(r + randomInt(-variance, variance))
+    const ng = clampChannel(g + randomInt(-variance, variance))
+    const nb = clampChannel(b + randomInt(-variance, variance))
+
+    return `#${[nr, ng, nb].map(v => v.toString(16).padStart(2, '0')).join('').toUpperCase()}`
+  }
+
+  const hexToRgb = (hexColor: string) => {
+    const cleaned = hexColor.replace('#', '')
+    return {
+      r: parseInt(cleaned.slice(0, 2), 16),
+      g: parseInt(cleaned.slice(2, 4), 16),
+      b: parseInt(cleaned.slice(4, 6), 16)
+    }
+  }
+
+  const derivePaletteIdentity = (colors: string[]) => {
+    const rgb = colors.map(hexToRgb)
+    const avg = rgb.reduce(
+      (acc, c) => ({ r: acc.r + c.r, g: acc.g + c.g, b: acc.b + c.b }),
+      { r: 0, g: 0, b: 0 }
+    )
+
+    const avgR = avg.r / rgb.length
+    const avgG = avg.g / rgb.length
+    const avgB = avg.b / rgb.length
+    const brightness = (avgR + avgG + avgB) / 3
+    const warmth = avgR - avgB
+
+    const contrast = rgb.reduce((sum, c) => {
+      const max = Math.max(c.r, c.g, c.b)
+      const min = Math.min(c.r, c.g, c.b)
+      return sum + (max - min)
+    }, 0) / rgb.length
+
+    let family = 'Neutral'
+    if (warmth > 28) family = 'Amber'
+    else if (warmth < -28) family = 'Azure'
+    else if (avgG > avgR + 8 && avgG > avgB + 8) family = 'Sage'
+    else if (brightness > 210) family = 'Ivory'
+    else if (brightness < 95) family = 'Noir'
+    else if (contrast < 35) family = 'Stone'
+
+    let finish = 'Edit'
+    if (contrast > 95) finish = 'Statement'
+    else if (contrast > 70) finish = 'Composition'
+    else if (contrast < 30) finish = 'Whisper'
+
+    const temperaturePhrase = warmth > 20
+      ? 'warm undertones'
+      : warmth < -20
+        ? 'cool undertones'
+        : 'balanced undertones'
+
+    const lightPhrase = brightness > 200
+      ? 'with an airy, light-forward feel'
+      : brightness < 110
+        ? 'with rich depth and dramatic weight'
+        : 'with a grounded mid-tone balance'
+
+    const contrastPhrase = contrast > 95
+      ? 'Built for bold visual contrast.'
+      : contrast < 30
+        ? 'Designed for a soft, seamless flow.'
+        : 'Calibrated for a refined, modern balance.'
+
+    const description = `A ${family.toLowerCase()} palette with ${temperaturePhrase}, ${lightPhrase} ${contrastPhrase}`
+
+    return {
+      name: `${family} ${finish}`,
+      mood: description
+    }
+  }
+
+  // Keep palettes stable during a session, but refresh with new shades on full reload.
+  const colorPalettes = useMemo(
+    () => baseColorPalettes.map((palette) => {
+      const colors = palette.colors.map(color => shiftHexColor(color))
+      const identity = derivePaletteIdentity(colors)
+      return {
+        ...palette,
+        ...identity,
+        colors
+      }
+    }),
+    []
+  )
 
   const faqs = [
     {
