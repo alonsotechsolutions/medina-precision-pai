@@ -228,17 +228,6 @@ const BLANK_QUOTE_FORM: QuoteFormData = {
 function App() {
   const [formData, setFormData] = useState<QuoteFormData>(BLANK_QUOTE_FORM)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
-
-  // Every entry point to the quote form (header button, hero CTA, floating
-  // CTA, contact-section CTA, estimator "Get My Exact Price", and palette
-  // cards) opens the dialog through this helper. It guarantees the form
-  // always starts blank and is then prefilled with only the context for the
-  // specific entry point — preventing stale data (e.g. an estimator summary
-  // hanging around after the user backs out and clicks a palette).
-  const openQuoteForm = useCallback((prefill?: Partial<QuoteFormData>) => {
-    setFormData({ ...BLANK_QUOTE_FORM, ...(prefill ?? {}) })
-    setIsDialogOpen(true)
-  }, [])
   const [showFloatingCTA, setShowFloatingCTA] = useState(false)
   const [isOwner, setIsOwner] = useState(false)
   const [showAdminPanel, setShowAdminPanel] = useState(false)
@@ -445,6 +434,17 @@ function App() {
       console.error('mailto fallback failed:', err)
       toast.error('Could not send email. Please call (478) 955-2341.')
     }
+  }
+
+  // Every entry point to the quote form (header button, hero CTA, floating
+  // CTA, contact-section CTA, estimator "Get My Exact Price", and palette
+  // cards) opens the dialog through this helper. It guarantees the form
+  // always starts blank and is then prefilled with only the context for the
+  // specific entry point — preventing stale data (e.g. an estimator summary
+  // hanging around after the user backs out and clicks a palette).
+  const openQuoteForm = (prefill?: Partial<QuoteFormData>) => {
+    setFormData({ ...BLANK_QUOTE_FORM, ...(prefill ?? {}) })
+    setIsDialogOpen(true)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
