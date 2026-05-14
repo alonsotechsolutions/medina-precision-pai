@@ -563,43 +563,58 @@ function App() {
       return sum + (max - min)
     }, 0) / rgb.length
 
-    let family = 'Neutral'
-    if (warmth > 28) family = 'Amber'
-    else if (warmth < -28) family = 'Azure'
-    else if (avgG > avgR + 8 && avgG > avgB + 8) family = 'Sage'
-    else if (brightness > 210) family = 'Ivory'
-    else if (brightness < 95) family = 'Noir'
-    else if (contrast < 35) family = 'Stone'
+    // Pick a homeowner-friendly name + short mood based on tone, brightness, and contrast.
+    // Names evoke real interior/exterior styles people search for when picking paint.
+    let name = 'Timeless Neutral'
+    let mood = 'Timeless & Versatile'
 
-    let finish = 'Edit'
-    if (contrast > 95) finish = 'Statement'
-    else if (contrast > 70) finish = 'Composition'
-    else if (contrast < 30) finish = 'Whisper'
+    const isGreen = avgG > avgR + 8 && avgG > avgB + 8
+    const isWarm = warmth > 25
+    const isCool = warmth < -25
+    const isBright = brightness > 195
+    const isDark = brightness < 105
+    const isHighContrast = contrast > 90
+    const isLowContrast = contrast < 32
 
-    const temperaturePhrase = warmth > 20
-      ? 'warm undertones'
-      : warmth < -20
-        ? 'cool undertones'
-        : 'balanced undertones'
-
-    const lightPhrase = brightness > 200
-      ? 'with an airy, light-forward feel'
-      : brightness < 110
-        ? 'with rich depth and dramatic weight'
-        : 'with a grounded mid-tone balance'
-
-    const contrastPhrase = contrast > 95
-      ? 'Built for bold visual contrast.'
-      : contrast < 30
-        ? 'Designed for a soft, seamless flow.'
-        : 'Calibrated for a refined, modern balance.'
-
-    const description = `A ${family.toLowerCase()} palette with ${temperaturePhrase}, ${lightPhrase} ${contrastPhrase}`
-
-    return {
-      name: `${family} ${finish}`,
-      mood: description
+    if (isGreen) {
+      name = isDark ? 'Garden Retreat' : 'Fresh Meadow'
+      mood = 'Natural & Fresh'
+    } else if (isWarm && isBright) {
+      name = 'Sunlit Living'
+      mood = 'Warm & Welcoming'
+    } else if (isWarm && isDark) {
+      name = 'Cozy Hearth'
+      mood = 'Rich & Inviting'
+    } else if (isWarm) {
+      name = 'Modern Farmhouse'
+      mood = 'Warm & Earthy'
+    } else if (isCool && isBright) {
+      name = 'Coastal Breeze'
+      mood = 'Serene & Airy'
+    } else if (isCool && isDark) {
+      name = 'Twilight Manor'
+      mood = 'Moody & Modern'
+    } else if (isCool) {
+      name = 'Hampton Blue'
+      mood = 'Calm & Classic'
+    } else if (isDark && isHighContrast) {
+      name = 'Bold Statement'
+      mood = 'Dramatic & Confident'
+    } else if (isBright && isLowContrast) {
+      name = 'Bright & Airy'
+      mood = 'Light & Open'
+    } else if (isHighContrast) {
+      name = 'Crisp Contrast'
+      mood = 'Sharp & Refined'
+    } else if (isLowContrast) {
+      name = 'Soft Greige'
+      mood = 'Soft & Soothing'
+    } else {
+      name = 'Classic Comfort'
+      mood = 'Timeless & Versatile'
     }
+
+    return { name, mood }
   }
 
   const createUniquePaletteName = (
@@ -1902,8 +1917,8 @@ function App() {
           </div>
         </section>
         <section id="warranty" data-page="about" className="py-20 bg-muted/30">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-            <Card className="overflow-hidden">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <Card className="overflow-hidden max-w-5xl mx-auto">
               <div className="grid md:grid-cols-[auto_1fr] gap-6 p-6 sm:p-10 items-center">
                 <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center mx-auto md:mx-0">
                   <ShieldCheck size={56} weight="duotone" className="text-primary" />
