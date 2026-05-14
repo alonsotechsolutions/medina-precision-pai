@@ -198,13 +198,13 @@ function App() {
 
   // Email integration: works on any static host (incl. GitHub Pages).
   // Strategy:
-  //   1. If a Formspree form id is configured via VITE_FORMSPREE_ID, POST the
-  //      quote to https://formspree.io/f/<id>. This delivers an email to the
-  //      business owner without any backend server.
+  //   1. POST the quote to Formspree (React + fetch/AJAX) so it works on static
+  //      hosting like GitHub Pages without any backend server.
   //   2. Always also open a pre-filled mailto: link as a guaranteed fallback,
-  //      so the visitor's mail client can send the lead even if Formspree is
-  //      not configured or the network call fails.
+  //      so the visitor's mail client can send the lead even if the network
+  //      call fails.
   const BUSINESS_EMAIL = 'azianninja1295@gmail.com'
+  const FORMSPREE_FORM_ID = 'mlgzkqek'
 
   const buildEmailBody = (quote: QuoteRequest) => (
     `New quote request from ${quote.name}\n\n` +
@@ -227,39 +227,38 @@ function App() {
     const subject = `New Quote Request from ${quote.name}`
     const body = buildEmailBody(quote)
 
-    // 1. Try Formspree if configured.
-    const formspreeId = (import.meta as unknown as { env: Record<string, string | undefined> })
-      .env.VITE_FORMSPREE_ID
-    if (formspreeId) {
-      try {
-        const res = await fetch(`https://formspree.io/f/${formspreeId}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-          body: JSON.stringify({
-            _subject: subject,
-            _replyto: quote.email,
-            name: quote.name,
-            email: quote.email,
-            phone: quote.phone,
-            address: quote.address,
-            serviceType: quote.serviceType,
-            propertyType: quote.propertyType,
-            preferredDate: quote.preferredDate,
-            budgetRange: quote.budgetRange,
-            referralSource: quote.referralSource,
-            projectDescription: quote.projectDescription,
-            submittedAt: quote.submittedAt,
-            message: body,
-          }),
-        })
-        if (res.ok) {
-          toast.success('Email sent to Medina Precision Painting.')
-          return
-        }
-        console.warn('Formspree responded with non-OK status', res.status)
-      } catch (err) {
-        console.warn('Formspree submission failed, falling back to mailto:', err)
+    // 1. Try Formspree first. VITE_FORMSPREE_ID can override the built-in id.
+    const formspreeId =
+      (import.meta as unknown as { env: Record<string, string | undefined> }).env.VITE_FORMSPREE_ID ||
+      FORMSPREE_FORM_ID
+    try {
+      const res = await fetch(`https://formspree.io/f/${formspreeId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          _subject: subject,
+          _replyto: quote.email,
+          name: quote.name,
+          email: quote.email,
+          phone: quote.phone,
+          address: quote.address,
+          serviceType: quote.serviceType,
+          propertyType: quote.propertyType,
+          preferredDate: quote.preferredDate,
+          budgetRange: quote.budgetRange,
+          referralSource: quote.referralSource,
+          projectDescription: quote.projectDescription,
+          submittedAt: quote.submittedAt,
+          message: body,
+        }),
+      })
+      if (res.ok) {
+        toast.success('Email sent to Medina Precision Painting.')
+        return
       }
+      console.warn('Formspree responded with non-OK status', res.status)
+    } catch (err) {
+      console.warn('Formspree submission failed, falling back to mailto:', err)
     }
 
     // 2. Mailto fallback — opens the visitor's mail client with a pre-filled
@@ -593,7 +592,6 @@ function App() {
 
   const createUniquePaletteName = (
     baseName: string,
-    colors: string[],
     usedNames: Set<string>,
     historicalNames: Set<string>
   ) => {
@@ -607,21 +605,11 @@ function App() {
       return reserve(baseName)
     }
 
-    const signature = colors
-      .map(color => color.replace('#', ''))
-      .join('')
-      .slice(0, 6)
-      .toUpperCase()
-
-    let candidate = `${baseName} ${signature}`
-    if (!usedNames.has(candidate) && !historicalNames.has(candidate)) {
-      return reserve(candidate)
-    }
-
     let counter = 2
+    let candidate = `${baseName} ${counter}`
     while (usedNames.has(candidate) || historicalNames.has(candidate)) {
-      candidate = `${baseName} ${signature}-${counter}`
       counter += 1
+      candidate = `${baseName} ${counter}`
     }
 
     return reserve(candidate)
@@ -648,12 +636,12 @@ function App() {
     const generated = baseColorPalettes.map((palette) => {
       const colors = palette.colors.map(color => shiftHexColor(color))
       const identity = derivePaletteIdentity(colors)
-      const uniqueName = createUniquePaletteName(identity.name, colors, usedNames, historicalNames)
+      const uniqueName = createUniquePaletteName(identity.name, usedNames, historicalNames)
       return {
         ...palette,
         ...identity,
         name: uniqueName,
-        colors
+        colors,
       }
     })
 
@@ -1729,7 +1717,22 @@ function App() {
               </p>
             </motion.div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {colorPalettes.map((palette, index) => (
+              {colorPalettes.map((palette, index) => {
+                const openWithPalette = () => {
+                  const paletteLine = `Inspired by palette: ${palette.name} (${palette.mood}) — Colors: ${palette.colors.join(', ')}`
+                  setFormData(prev => {
+                    const existing = (prev.projectDescription || '').trim()
+                    const alreadyHasPalette = existing.includes('Inspired by palette:')
+                    const nextDescription = alreadyHasPalette
+                      ? existing.replace(/Inspired by palette:.*$/m, paletteLine)
+                      : existing
+                        ? `${existing}\n\n${paletteLine}`
+                        : paletteLine
+                    return { ...prev, projectDescription: nextDescription }
+                  })
+                  setIsDialogOpen(true)
+                }
+                return (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, y: 20 }}
@@ -1737,7 +1740,19 @@ function App() {
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.05 }}
                 >
-                  <Card className="overflow-hidden hover:shadow-lg transition-all duration-300">
+                  <Card
+                    role="button"
+                    tabIndex={0}
+                    onClick={openWithPalette}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault()
+                        openWithPalette()
+                      }
+                    }}
+                    aria-label={`Request a free quote inspired by the ${palette.name} palette`}
+                    className="overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                  >
                     <div className="flex h-32">
                       {palette.colors.map((color, idx) => (
                         <div
@@ -1760,10 +1775,14 @@ function App() {
                           <code key={idx} className="text-xs bg-muted px-2 py-0.5 rounded">{color}</code>
                         ))}
                       </div>
+                      <p className="text-xs text-primary mt-3 font-medium">
+                        Click to request a free quote with this palette →
+                      </p>
                     </CardContent>
                   </Card>
                 </motion.div>
-              ))}
+                )
+              })}
             </div>
           </div>
         </section>
