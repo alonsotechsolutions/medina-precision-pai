@@ -591,19 +591,83 @@ function App() {
     }
   }
 
+  const createUniquePaletteName = (
+    baseName: string,
+    colors: string[],
+    usedNames: Set<string>,
+    historicalNames: Set<string>
+  ) => {
+    const reserve = (candidate: string) => {
+      usedNames.add(candidate)
+      historicalNames.add(candidate)
+      return candidate
+    }
+
+    if (!usedNames.has(baseName) && !historicalNames.has(baseName)) {
+      return reserve(baseName)
+    }
+
+    const signature = colors
+      .map(color => color.replace('#', ''))
+      .join('')
+      .slice(0, 6)
+      .toUpperCase()
+
+    let candidate = `${baseName} ${signature}`
+    if (!usedNames.has(candidate) && !historicalNames.has(candidate)) {
+      return reserve(candidate)
+    }
+
+    let counter = 2
+    while (usedNames.has(candidate) || historicalNames.has(candidate)) {
+      candidate = `${baseName} ${signature}-${counter}`
+      counter += 1
+    }
+
+    return reserve(candidate)
+  }
+
   // Keep palettes stable during a session, but refresh with new shades on full reload.
-  const colorPalettes = useMemo(
-    () => baseColorPalettes.map((palette) => {
+  const colorPalettes = useMemo(() => {
+    const usedNames = new Set<string>()
+    const historicalNames = new Set<string>()
+    const storageKey = 'medina-palette-name-history'
+
+    if (typeof window !== 'undefined') {
+      try {
+        const raw = window.localStorage.getItem(storageKey)
+        if (raw) {
+          const parsed = JSON.parse(raw) as string[]
+          parsed.forEach(name => historicalNames.add(name))
+        }
+      } catch (err) {
+        console.warn('Could not read palette name history', err)
+      }
+    }
+
+    const generated = baseColorPalettes.map((palette) => {
       const colors = palette.colors.map(color => shiftHexColor(color))
       const identity = derivePaletteIdentity(colors)
+      const uniqueName = createUniquePaletteName(identity.name, colors, usedNames, historicalNames)
       return {
         ...palette,
         ...identity,
+        name: uniqueName,
         colors
       }
-    }),
-    []
-  )
+    })
+
+    if (typeof window !== 'undefined') {
+      try {
+        const trimmedHistory = Array.from(historicalNames).slice(-800)
+        window.localStorage.setItem(storageKey, JSON.stringify(trimmedHistory))
+      } catch (err) {
+        console.warn('Could not save palette name history', err)
+      }
+    }
+
+    return generated
+  }, [])
 
   const faqs = [
     {
