@@ -9,7 +9,7 @@ import { useQuoteForm } from '@/contexts/QuoteFormContext'
 import { SERVICE_OPTIONS } from '@/types/quote'
 
 export const QuoteFormDialog = () => {
-  const { formData, setFormData, isDialogOpen, setIsDialogOpen, submitQuote } = useQuoteForm()
+  const { formData, setFormData, isSubmitting, isDialogOpen, setIsDialogOpen, submitQuote } = useQuoteForm()
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -20,22 +20,22 @@ export const QuoteFormDialog = () => {
             Fill out the form below and we'll contact you within 24 hours with a detailed estimate.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={submitQuote} className="space-y-4 mt-4">
+        <form onSubmit={submitQuote} className="space-y-4 mt-4" noValidate>
           <div className="space-y-2">
             <Label htmlFor="name">Name *</Label>
-            <Input id="name" required value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="John Smith" />
+            <Input id="name" required autoComplete="name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="John Smith" />
           </div>
           <div className="space-y-2">
             <Label htmlFor="email">Email *</Label>
-            <Input id="email" type="email" required value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} placeholder="john@example.com" />
+            <Input id="email" type="email" required autoComplete="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} placeholder="john@example.com" />
           </div>
           <div className="space-y-2">
             <Label htmlFor="phone">Phone *</Label>
-            <Input id="phone" type="tel" required value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} placeholder="(555) 123-4567" />
+            <Input id="phone" type="tel" required autoComplete="tel" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} placeholder="(555) 123-4567" />
           </div>
           <div className="space-y-2">
             <Label htmlFor="address">Property Address</Label>
-            <Input id="address" value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })} placeholder="123 Main St, Warner Robins, GA" />
+            <Input id="address" autoComplete="street-address" value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })} placeholder="123 Main St, Warner Robins, GA" />
           </div>
           <div className="space-y-2">
             <Label>Service Type *</Label>
@@ -118,7 +118,9 @@ export const QuoteFormDialog = () => {
               </SelectContent>
             </Select>
           </div>
-          <Button type="submit" className="w-full bg-primary hover:bg-primary/90">Submit Request</Button>
+          <Button type="submit" className="w-full bg-primary hover:bg-primary/90" disabled={isSubmitting}>
+            {isSubmitting ? 'Submitting Request…' : 'Submit Request'}
+          </Button>
         </form>
       </DialogContent>
     </Dialog>

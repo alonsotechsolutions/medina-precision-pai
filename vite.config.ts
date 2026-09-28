@@ -8,9 +8,12 @@ import { resolve } from 'path'
 
 const projectRoot = process.env.PROJECT_ROOT || import.meta.dirname
 const githubRepository = process.env.GITHUB_REPOSITORY;
-const pagesBase = githubRepository
-  ? `/${githubRepository.split('/')[1]}/`
-  : '/medina-precision-pai/';
+const basePathOverride = process.env.BASE_PATH?.trim()
+const pagesBase = basePathOverride
+  ? basePathOverride
+  : process.env.GITHUB_ACTIONS === 'true' && githubRepository
+    ? `/${githubRepository.split('/')[1]}/`
+    : '/';
 
 // https://vite.dev/config/
 export default defineConfig({

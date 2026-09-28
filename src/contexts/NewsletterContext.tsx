@@ -2,8 +2,10 @@ import { createContext, useContext, useState } from 'react'
 import type { ReactNode } from 'react'
 import { toast } from 'sonner'
 import { useLocalStorage } from '@/hooks/use-local-storage'
-import { BUSINESS_EMAIL, FORMSPREE_NEWSLETTER_FORM_ID, deliverEmail } from '@/lib/email'
+import { FORMSPREE_NEWSLETTER_FORM_ID, deliverEmail } from '@/lib/email'
 import type { EmailDeliveryChannel } from '@/lib/email'
+import { BUSINESS_EMAIL } from '@/lib/site'
+import { newsletterSchema } from '@/lib/validation'
 
 export interface NewsletterSubscriber {
   email: string
@@ -13,6 +15,7 @@ export interface NewsletterSubscriber {
 interface NewsletterContextValue {
   email: string
   setEmail: (v: string) => void
+  isSubmitting: boolean
   subscribers: NewsletterSubscriber[]
   submit: (e: React.FormEvent) => Promise<void>
 }
@@ -48,6 +51,7 @@ const sendNewsletterNotification = async (
 
 export const NewsletterProvider = ({ children }: { children: ReactNode }) => {
   const [email, setEmail] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [subscribers, setSubscribers] = useLocalStorage<NewsletterSubscriber[]>(
     'newsletter-subscribers',
     [],
@@ -55,11 +59,14 @@ export const NewsletterProvider = ({ children }: { children: ReactNode }) => {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
-    const cleaned = email.trim().toLowerCase()
-    if (!cleaned || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleaned)) {
-      toast.error('Please enter a valid email address')
+    if (isSubmitting) return
+
+    const result = newsletterSchema.safeParse({ email })
+    if (!result.success) {
+      toast.error(result.error.issues[0]?.message || 'Please enter a valid email address')
       return
     }
+    const cleaned = result.data.email.toLowerCase()
 
     const subscribedAt = new Date().toISOString()
     let isDuplicate = false
@@ -78,22 +85,27 @@ export const NewsletterProvider = ({ children }: { children: ReactNode }) => {
       return
     }
 
-    const channel = await sendNewsletterNotification(cleaned, subscribedAt)
-    if (channel === 'formspree' || channel === 'formsubmit') {
-      toast.success('Thanks for subscribing! You\'re on the list.')
-    } else if (channel === 'mailto') {
-      toast.info('Subscription saved. Please send the pre-filled email that opened.', {
-        description: `If nothing opens, email us at ${BUSINESS_EMAIL}.`,
-      })
-    } else {
-      toast.error('Subscription saved, but email delivery failed right now.')
-    }
+    setIsSubmitting(true)
+    try {
+      const channel = await sendNewsletterNotification(cleaned, subscribedAt)
+      if (channel === 'formspree' || channel === 'formsubmit') {
+        toast.success('Thanks for subscribing! You\'re on the list.')
+      } else if (channel === 'mailto') {
+        toast.info('Subscription saved. Please send the pre-filled email that opened.', {
+          description: `If nothing opens, email us at ${BUSINESS_EMAIL}.`,
+        })
+      } else {
+        toast.error('Subscription saved, but email delivery failed right now.')
+      }
 
-    setEmail('')
+      setEmail('')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
-    <NewsletterContext.Provider value={{ email, setEmail, subscribers, submit }}>
+    <NewsletterContext.Provider value={{ email, setEmail, isSubmitting, subscribers, submit }}>
       {children}
     </NewsletterContext.Provider>
   )

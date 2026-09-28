@@ -2,10 +2,12 @@ import { createContext, useCallback, useContext, useState } from 'react'
 import type { ReactNode } from 'react'
 import { toast } from 'sonner'
 import { useLocalStorage } from '@/hooks/use-local-storage'
-import { BUSINESS_EMAIL, FORMSPREE_QUOTE_FORM_ID, deliverEmail } from '@/lib/email'
+import { FORMSPREE_QUOTE_FORM_ID, deliverEmail } from '@/lib/email'
 import type { EmailDeliveryChannel } from '@/lib/email'
 import { buildEmailBody, buildPaletteHtmlBlock, buildPrintUrl } from '@/lib/email-templates'
 import { formatServices, getQuoteServices } from '@/lib/quote-helpers'
+import { BUSINESS_EMAIL, BUSINESS_PHONE_DISPLAY } from '@/lib/site'
+import { quoteFormSchema } from '@/lib/validation'
 import { formatSwatchLabel } from '@/data/palettes'
 import { BLANK_QUOTE_FORM } from '@/types/quote'
 import type { QuoteFormData, QuoteRequest } from '@/types/quote'
@@ -14,6 +16,7 @@ interface QuoteFormContextValue {
   // Form state
   formData: QuoteFormData
   setFormData: React.Dispatch<React.SetStateAction<QuoteFormData>>
+  isSubmitting: boolean
   isDialogOpen: boolean
   setIsDialogOpen: (open: boolean) => void
   openQuoteForm: (prefill?: Partial<QuoteFormData>) => void
@@ -30,6 +33,7 @@ const QuoteFormContext = createContext<QuoteFormContextValue | null>(null)
 
 export const QuoteFormProvider = ({ children }: { children: ReactNode }) => {
   const [formData, setFormData] = useState<QuoteFormData>(BLANK_QUOTE_FORM)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [quotes, setQuotes] = useLocalStorage<QuoteRequest[]>('quote-requests', [])
 
@@ -84,24 +88,34 @@ export const QuoteFormProvider = ({ children }: { children: ReactNode }) => {
 
   const submitQuote = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (isSubmitting) return
 
-    if (formData.serviceTypes.length === 0) {
-      toast.error('Please select at least one service')
+    const result = quoteFormSchema.safeParse({
+      ...formData,
+      name: formData.name.trim(),
+      email: formData.email.trim().toLowerCase(),
+      phone: formData.phone.trim(),
+      address: formData.address.trim(),
+      projectDescription: formData.projectDescription.trim(),
+    })
+    if (!result.success) {
+      toast.error(result.error.issues[0]?.message || 'Please review the quote form and try again')
       return
     }
 
+    const cleaned = result.data
     const newQuote: QuoteRequest = {
       id: `quote-${Date.now()}`,
-      name: formData.name,
-      email: formData.email,
-      phone: formData.phone,
-      address: formData.address,
-      serviceTypes: formData.serviceTypes,
-      propertyType: formData.propertyType,
-      projectDescription: formData.projectDescription,
-      preferredDate: formData.preferredDate,
-      budgetRange: formData.budgetRange,
-      referralSource: formData.referralSource,
+      name: cleaned.name,
+      email: cleaned.email,
+      phone: cleaned.phone,
+      address: cleaned.address || '',
+      serviceTypes: cleaned.serviceTypes,
+      propertyType: cleaned.propertyType || '',
+      projectDescription: cleaned.projectDescription || '',
+      preferredDate: cleaned.preferredDate || '',
+      budgetRange: cleaned.budgetRange || '',
+      referralSource: cleaned.referralSource || '',
       selectedPalette: formData.selectedPalette,
       status: 'new',
       submittedAt: new Date().toISOString(),
@@ -109,20 +123,25 @@ export const QuoteFormProvider = ({ children }: { children: ReactNode }) => {
 
     setQuotes(currentQuotes => [newQuote, ...(currentQuotes || [])])
 
-    const channel = await sendEmailNotification(newQuote)
+    setIsSubmitting(true)
+    try {
+      const channel = await sendEmailNotification(newQuote)
 
-    if (channel === 'formspree' || channel === 'formsubmit') {
-      toast.success('Quote request submitted! We\'ll contact you within 24 hours.')
-    } else if (channel === 'mailto') {
-      toast.info('Quote request saved. Please send the pre-filled email that opened.', {
-        description: `If nothing opens, email us at ${BUSINESS_EMAIL}.`,
-      })
-    } else {
-      toast.error('Quote saved, but email delivery failed. Please call (478) 955-2341.')
+      if (channel === 'formspree' || channel === 'formsubmit') {
+        toast.success('Quote request submitted! We\'ll contact you within 24 hours.')
+      } else if (channel === 'mailto') {
+        toast.info('Quote request saved. Please send the pre-filled email that opened.', {
+          description: `If nothing opens, email us at ${BUSINESS_EMAIL}.`,
+        })
+      } else {
+        toast.error(`Quote saved, but email delivery failed. Please call ${BUSINESS_PHONE_DISPLAY}.`)
+      }
+
+      setIsDialogOpen(false)
+      setFormData(BLANK_QUOTE_FORM)
+    } finally {
+      setIsSubmitting(false)
     }
-
-    setIsDialogOpen(false)
-    setFormData(BLANK_QUOTE_FORM)
   }
 
   return (
@@ -130,6 +149,7 @@ export const QuoteFormProvider = ({ children }: { children: ReactNode }) => {
       value={{
         formData,
         setFormData,
+        isSubmitting,
         isDialogOpen,
         setIsDialogOpen,
         openQuoteForm,

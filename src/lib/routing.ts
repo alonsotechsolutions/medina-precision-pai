@@ -1,15 +1,23 @@
 import { VALID_PAGES } from '@/data/navigation'
 import type { PageKey } from '@/data/navigation'
 
-export const parseHashPage = (): PageKey => {
-  if (typeof window === 'undefined') return 'home'
+export interface ParsedHashPage {
+  page: PageKey
+  notFound: boolean
+}
+
+export const parseHashPage = (): ParsedHashPage => {
+  if (typeof window === 'undefined') return { page: 'home', notFound: false }
   const h = window.location.hash
   if (h.startsWith('#/')) {
     const rest = h.slice(2).split('?')[0]
     const key = rest.toLowerCase() as PageKey
-    return (VALID_PAGES as readonly string[]).includes(key) ? key : 'home'
+    if ((VALID_PAGES as readonly string[]).includes(key)) {
+      return { page: key, notFound: false }
+    }
+    return { page: 'home', notFound: rest.length > 0 && !rest.startsWith('print') }
   }
-  return 'home'
+  return { page: 'home', notFound: false }
 }
 
 // A standalone printable color sheet route: `#/print?p=<slug>`.

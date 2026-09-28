@@ -6,6 +6,12 @@ export const setMetaTag = (selector: string, content: string): void => {
   if (el) el.setAttribute('content', content)
 }
 
+export const setLinkHref = (selector: string, href: string): void => {
+  if (typeof document === 'undefined') return
+  const el = document.querySelector<HTMLLinkElement>(selector)
+  if (el) el.setAttribute('href', href)
+}
+
 // Inject FAQPage structured data once. Helps Google render an FAQ rich
 // result on the homepage SERP. Returns a cleanup function suitable for
 // useEffect.

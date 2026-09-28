@@ -1,4 +1,5 @@
 import { createRoot } from 'react-dom/client'
+import { MotionConfig } from 'framer-motion'
 import { ErrorBoundary } from "react-error-boundary";
 
 import App from './App.tsx'
@@ -26,6 +27,8 @@ setFavicon(logoImage)
 
 createRoot(document.getElementById('root')!).render(
   <ErrorBoundary FallbackComponent={ErrorFallback}>
-    <App />
+    <MotionConfig reducedMotion="user">
+      <App />
+    </MotionConfig>
   </ErrorBoundary>
 )
