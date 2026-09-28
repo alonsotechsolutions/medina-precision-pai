@@ -1,7 +1,8 @@
 import { Alert, AlertTitle, AlertDescription } from "./components/ui/alert";
 import { Button } from "./components/ui/button";
 
-import { AlertTriangleIcon, RefreshCwIcon } from "lucide-react";
+import { AlertTriangleIcon, HomeIcon, RefreshCwIcon } from "lucide-react";
+import { buildPhoneHref, BUSINESS_PHONE_DISPLAY } from "@/lib/site";
 
 export const ErrorFallback = ({ error, resetErrorBoundary }) => {
   // When encountering an error in the development mode, rethrow it and don't display the boundary.
@@ -13,9 +14,9 @@ export const ErrorFallback = ({ error, resetErrorBoundary }) => {
       <div className="w-full max-w-md">
         <Alert variant="destructive" className="mb-6">
           <AlertTriangleIcon />
-          <AlertTitle>This spark has encountered a runtime error</AlertTitle>
+          <AlertTitle>We hit an unexpected error</AlertTitle>
           <AlertDescription>
-            Something unexpected happened while running the application. The error details are shown below. Contact the spark author and let them know about this issue.
+            Something unexpected happened while loading the site. Please try again or contact us directly if the problem continues.
           </AlertDescription>
         </Alert>
         
@@ -26,14 +27,27 @@ export const ErrorFallback = ({ error, resetErrorBoundary }) => {
           </pre>
         </div>
         
-        <Button 
-          onClick={resetErrorBoundary} 
-          className="w-full"
-          variant="outline"
-        >
-          <RefreshCwIcon />
-          Try Again
-        </Button>
+        <div className="grid gap-3">
+          <Button 
+            onClick={resetErrorBoundary} 
+            className="w-full"
+            variant="outline"
+          >
+            <RefreshCwIcon />
+            Try Again
+          </Button>
+          <Button asChild className="w-full">
+            <a href="#/">
+              <HomeIcon />
+              Return Home
+            </a>
+          </Button>
+          <Button asChild variant="secondary" className="w-full">
+            <a href={buildPhoneHref()}>
+              Call {BUSINESS_PHONE_DISPLAY}
+            </a>
+          </Button>
+        </div>
       </div>
     </div>
   );

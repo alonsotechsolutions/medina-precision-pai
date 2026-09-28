@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import { Calendar, Medal, Phone, ShieldCheck, Sparkle } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { useQuoteForm } from '@/contexts/QuoteFormContext'
+import { buildPhoneHref, BUSINESS_PHONE_DISPLAY } from '@/lib/site'
 
 export const HeroSection = () => {
   const { openQuoteForm } = useQuoteForm()
@@ -32,10 +33,10 @@ export const HeroSection = () => {
               <Calendar size={24} className="mr-2" />
               Get Free Estimate
             </Button>
-            <a href="tel:4789552341">
+            <a href={buildPhoneHref()}>
               <Button size="lg" variant="secondary" className="text-lg px-8">
                 <Phone size={24} className="mr-2" />
-                (478) 955-2341
+                {BUSINESS_PHONE_DISPLAY}
               </Button>
             </a>
           </div>

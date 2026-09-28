@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { Clock, EnvelopeSimple, MapPin, Phone } from '@phosphor-icons/react'
+import { buildMailtoHref, buildPhoneHref, BUSINESS_EMAIL, BUSINESS_PHONE_DISPLAY } from '@/lib/site'
 
 export const ContactSection = () => (
   <section id="contact" data-page="home contact" className="py-20 bg-background">
@@ -29,8 +30,8 @@ export const ContactSection = () => (
             <Phone size={28} weight="duotone" className="text-primary" />
           </div>
           <h3 className="font-semibold mb-2">Phone</h3>
-          <a href="tel:4789552341" className="text-muted-foreground hover:text-primary transition-colors">
-            (478) 955-2341
+          <a href={buildPhoneHref()} className="text-muted-foreground hover:text-primary transition-colors">
+            {BUSINESS_PHONE_DISPLAY}
           </a>
         </motion.div>
         <motion.div
@@ -44,8 +45,8 @@ export const ContactSection = () => (
             <EnvelopeSimple size={28} weight="duotone" className="text-primary" />
           </div>
           <h3 className="font-semibold mb-2">Email</h3>
-          <a href="mailto:azianninja1295@gmail.com" className="text-muted-foreground hover:text-primary transition-colors break-all">
-            azianninja1295@gmail.com
+          <a href={buildMailtoHref()} className="text-muted-foreground hover:text-primary transition-colors break-all">
+            {BUSINESS_EMAIL}
           </a>
         </motion.div>
         <motion.div

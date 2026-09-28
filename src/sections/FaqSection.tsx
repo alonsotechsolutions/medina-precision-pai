@@ -3,6 +3,7 @@ import { Phone } from '@phosphor-icons/react'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { Button } from '@/components/ui/button'
 import { faqs } from '@/data/faqs'
+import { buildPhoneHref, BUSINESS_PHONE_DISPLAY } from '@/lib/site'
 
 export const FaqSection = () => (
   <section id="faq" data-page="services" className="py-20 bg-background">
@@ -34,10 +35,10 @@ export const FaqSection = () => (
       </Accordion>
       <div className="text-center mt-8">
         <p className="text-muted-foreground mb-3">Don't see your question?</p>
-        <a href="tel:4789552341">
+        <a href={buildPhoneHref()}>
           <Button variant="outline">
             <Phone size={18} className="mr-2" />
-            Call (478) 955-2341
+            Call {BUSINESS_PHONE_DISPLAY}
           </Button>
         </a>
       </div>

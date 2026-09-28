@@ -4,6 +4,7 @@ import { useQuoteForm } from '@/contexts/QuoteFormContext'
 import { navTabs } from '@/data/navigation'
 import type { PageKey } from '@/data/navigation'
 import logoImage from '@/assets/images/Logo.png'
+import { buildPhoneHref, BUSINESS_PHONE_DISPLAY } from '@/lib/site'
 
 interface Props {
   currentPage: PageKey
@@ -28,10 +29,11 @@ export const Header = ({ currentPage, isOwner, onOpenAdminPanel }: Props) => {
               />
             </a>
           </div>
-          <nav className="hidden md:flex gap-2 ml-8">
+          <nav aria-label="Primary" className="hidden md:flex gap-2 ml-8">
             <a
               href="#/"
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${currentPage === 'home' ? 'text-primary bg-accent/40' : 'text-muted-foreground hover:text-primary hover:bg-accent/30'}`}
+              aria-current={currentPage === 'home' ? 'page' : undefined}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${currentPage === 'home' ? 'text-primary bg-accent/40' : 'text-muted-foreground hover:text-primary hover:bg-accent/30'}`}
             >
               Home
             </a>
@@ -40,7 +42,7 @@ export const Header = ({ currentPage, isOwner, onOpenAdminPanel }: Props) => {
                 key={tab.href}
                 href={tab.href}
                 aria-current={currentPage === tab.page ? 'page' : undefined}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${currentPage === tab.page ? 'text-primary bg-accent/40' : 'text-muted-foreground hover:text-primary hover:bg-accent/30'}`}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${currentPage === tab.page ? 'text-primary bg-accent/40' : 'text-muted-foreground hover:text-primary hover:bg-accent/30'}`}
               >
                 {tab.label}
               </a>
@@ -59,12 +61,12 @@ export const Header = ({ currentPage, isOwner, onOpenAdminPanel }: Props) => {
               </Button>
             )}
             <a
-              href="tel:4789552341"
-              aria-label="Call (478) 955-2341"
-              className="hidden sm:flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors whitespace-nowrap"
+              href={buildPhoneHref()}
+              aria-label={`Call ${BUSINESS_PHONE_DISPLAY}`}
+              className="hidden sm:flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-md"
             >
               <Phone size={18} weight="bold" />
-              <span className="hidden lg:inline">(478) 955-2341</span>
+              <span className="hidden lg:inline">{BUSINESS_PHONE_DISPLAY}</span>
             </a>
             <Button
               onClick={() => openQuoteForm()}
@@ -76,10 +78,11 @@ export const Header = ({ currentPage, isOwner, onOpenAdminPanel }: Props) => {
         </div>
       </div>
       {/* Mobile tab bar */}
-      <nav className="md:hidden flex justify-center gap-1 border-t border-border bg-background/95 backdrop-blur-md overflow-x-auto">
+      <nav aria-label="Mobile" className="md:hidden flex justify-center gap-1 border-t border-border bg-background/95 backdrop-blur-md overflow-x-auto">
         <a
           href="#/"
-          className={`px-2 py-2 text-xs font-medium whitespace-nowrap ${currentPage === 'home' ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`}
+          aria-current={currentPage === 'home' ? 'page' : undefined}
+          className={`px-2 py-2 text-xs font-medium whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm ${currentPage === 'home' ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`}
         >
           Home
         </a>
@@ -88,7 +91,7 @@ export const Header = ({ currentPage, isOwner, onOpenAdminPanel }: Props) => {
             key={tab.href}
             href={tab.href}
             aria-current={currentPage === tab.page ? 'page' : undefined}
-            className={`px-2 py-2 text-xs font-medium whitespace-nowrap ${currentPage === tab.page ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`}
+            className={`px-2 py-2 text-xs font-medium whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm ${currentPage === tab.page ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`}
           >
             {tab.label}
           </a>

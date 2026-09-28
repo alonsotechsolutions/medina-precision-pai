@@ -5,13 +5,13 @@
 // All keys are sourced from VITE_* env vars with sensible defaults so the
 // site keeps working even when the deployer forgets to set them.
 
-const ENV = (import.meta as unknown as { env: Record<string, string | undefined> }).env
+import { BUSINESS_EMAIL } from '@/lib/site'
 
-export const BUSINESS_EMAIL =
-  ENV.VITE_BUSINESS_EMAIL || 'azianninja1295@gmail.com'
+const ENV = (import.meta as unknown as { env: Record<string, string | undefined> }).env
+const FORMSUBMIT_ENABLED = ENV.VITE_USE_FORMSUBMIT === 'true'
 
 export const FORMSPREE_QUOTE_FORM_ID =
-  ENV.VITE_FORMSPREE_QUOTE_FORM_ID || ENV.VITE_FORMSPREE_ID || 'mlgzkqek'
+  ENV.VITE_FORMSPREE_QUOTE_FORM_ID?.trim() || ENV.VITE_FORMSPREE_ID?.trim() || ''
 
 export const FORMSPREE_NEWSLETTER_FORM_ID =
   ENV.VITE_FORMSPREE_NEWSLETTER_FORM_ID || FORMSPREE_QUOTE_FORM_ID
@@ -41,6 +41,7 @@ export const postToFormspree = async (
 export const postToFormSubmit = async (
   payload: Record<string, string | undefined>,
 ): Promise<boolean> => {
+  if (!FORMSUBMIT_ENABLED) return false
   try {
     const res = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(BUSINESS_EMAIL)}`, {
       method: 'POST',
@@ -88,13 +89,15 @@ export const deliverEmail = async ({
   body,
   fields,
 }: DeliverEmailArgs): Promise<EmailDeliveryChannel> => {
-  const formspreeOk = await postToFormspree(formspreeId, {
-    _subject: subject,
-    _replyto: replyTo,
-    message: body,
-    ...fields,
-  })
-  if (formspreeOk) return 'formspree'
+  if (formspreeId) {
+    const formspreeOk = await postToFormspree(formspreeId, {
+      _subject: subject,
+      _replyto: replyTo,
+      message: body,
+      ...fields,
+    })
+    if (formspreeOk) return 'formspree'
+  }
 
   const formSubmitOk = await postToFormSubmit({
     _subject: subject,

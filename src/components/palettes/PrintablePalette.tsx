@@ -1,5 +1,6 @@
 import { Printer } from '@phosphor-icons/react'
 import { getPaletteBySlug } from '@/data/palettes'
+import { BUSINESS_NAME, SITE_URL } from '@/lib/site'
 
 interface Props {
   slug: string
@@ -24,9 +25,9 @@ export const PrintablePalette = ({ slug }: Props) => {
               <p className="text-gray-600 mt-1">{palette.mood}</p>
             </div>
             <div className="text-right text-sm text-gray-600">
-              <div className="font-semibold text-gray-900">Medina Precision Painting</div>
+              <div className="font-semibold text-gray-900">{BUSINESS_NAME}</div>
               <div>Warner Robins, GA</div>
-              <div>medinaprecisionpainting.com</div>
+              <div>{SITE_URL.replace(/^https?:\/\//, '')}</div>
             </div>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">

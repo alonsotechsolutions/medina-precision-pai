@@ -13,9 +13,18 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useNewsletter } from '@/contexts/NewsletterContext'
 import logoImage from '@/assets/images/Logo.png'
+import {
+  buildMailtoHref,
+  buildPhoneHref,
+  BUSINESS_EMAIL,
+  BUSINESS_PHONE_DISPLAY,
+  FACEBOOK_URL,
+  GOOGLE_REVIEW_URL,
+  INSTAGRAM_URL,
+} from '@/lib/site'
 
 export const Footer = () => {
-  const { email, setEmail, submit } = useNewsletter()
+  const { email, setEmail, isSubmitting, submit } = useNewsletter()
 
   return (
     <footer className="bg-foreground text-background">
@@ -29,29 +38,33 @@ export const Footer = () => {
               Family-owned painting contractor serving Warner Robins and all of Georgia. Licensed, insured, and backed by a 2-year warranty.
             </p>
             <div className="flex gap-3">
+              {FACEBOOK_URL && (
+                <a
+                  href={FACEBOOK_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Facebook"
+                  className="w-9 h-9 rounded-full bg-background/10 hover:bg-accent flex items-center justify-center transition-colors"
+                >
+                  <FacebookLogo size={18} weight="fill" />
+                </a>
+              )}
+              {INSTAGRAM_URL && (
+                <a
+                  href={INSTAGRAM_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram"
+                  className="w-9 h-9 rounded-full bg-background/10 hover:bg-accent flex items-center justify-center transition-colors"
+                >
+                  <InstagramLogo size={18} weight="fill" />
+                </a>
+              )}
               <a
-                href="https://www.facebook.com/"
+                href={GOOGLE_REVIEW_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="Facebook"
-                className="w-9 h-9 rounded-full bg-background/10 hover:bg-accent flex items-center justify-center transition-colors"
-              >
-                <FacebookLogo size={18} weight="fill" />
-              </a>
-              <a
-                href="https://www.instagram.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Instagram"
-                className="w-9 h-9 rounded-full bg-background/10 hover:bg-accent flex items-center justify-center transition-colors"
-              >
-                <InstagramLogo size={18} weight="fill" />
-              </a>
-              <a
-                href="https://www.google.com/search?q=Medina+Precision+Painting"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Google Business"
+                aria-label="Google Business reviews"
                 className="w-9 h-9 rounded-full bg-background/10 hover:bg-accent flex items-center justify-center transition-colors"
               >
                 <GoogleLogo size={18} weight="fill" />
@@ -62,11 +75,12 @@ export const Footer = () => {
           <div>
             <h4 className="font-semibold mb-4">Quick Links</h4>
             <ul className="space-y-2 text-sm opacity-80">
-              <li><a href="#/services" className="hover:opacity-100 hover:text-accent transition-colors">Our Process</a></li>
-              <li><a href="#/services" className="hover:opacity-100 hover:text-accent transition-colors">Cost Estimator</a></li>
-              <li><a href="#palettes" className="hover:opacity-100 hover:text-accent transition-colors">Color Inspiration</a></li>
-              <li><a href="#warranty" className="hover:opacity-100 hover:text-accent transition-colors">Warranty</a></li>
-              <li><a href="#faq" className="hover:opacity-100 hover:text-accent transition-colors">FAQ</a></li>
+              <li><a href="#/services" className="hover:opacity-100 hover:text-accent transition-colors">Our Services</a></li>
+              <li><a href="#/gallery" className="hover:opacity-100 hover:text-accent transition-colors">Project Gallery</a></li>
+              <li><a href="#/about" className="hover:opacity-100 hover:text-accent transition-colors">About Medina Precision</a></li>
+              <li><a href="#/" className="hover:opacity-100 hover:text-accent transition-colors">Color Inspiration</a></li>
+              <li><a href="#/about" className="hover:opacity-100 hover:text-accent transition-colors">Warranty</a></li>
+              <li><a href="#/services" className="hover:opacity-100 hover:text-accent transition-colors">FAQ</a></li>
             </ul>
           </div>
 
@@ -75,11 +89,11 @@ export const Footer = () => {
             <ul className="space-y-2 text-sm opacity-80">
               <li className="flex items-start gap-2">
                 <Phone size={16} weight="bold" className="mt-0.5 shrink-0" />
-                <a href="tel:4789552341" className="hover:opacity-100 hover:text-accent transition-colors">(478) 955-2341</a>
+                <a href={buildPhoneHref()} className="hover:opacity-100 hover:text-accent transition-colors">{BUSINESS_PHONE_DISPLAY}</a>
               </li>
               <li className="flex items-start gap-2">
                 <EnvelopeSimple size={16} weight="bold" className="mt-0.5 shrink-0" />
-                <a href="mailto:azianninja1295@gmail.com" className="hover:opacity-100 hover:text-accent transition-colors break-all">azianninja1295@gmail.com</a>
+                <a href={buildMailtoHref()} className="hover:opacity-100 hover:text-accent transition-colors break-all">{BUSINESS_EMAIL}</a>
               </li>
               <li className="flex items-start gap-2">
                 <MapPin size={16} weight="bold" className="mt-0.5 shrink-0" />
@@ -106,10 +120,11 @@ export const Footer = () => {
                 placeholder="you@example.com"
                 className="bg-background/10 border-background/20 text-background placeholder:text-background/50"
                 aria-label="Email address"
+                autoComplete="email"
               />
-              <Button type="submit" className="bg-accent hover:bg-accent/90 text-accent-foreground w-full">
+              <Button type="submit" className="bg-accent hover:bg-accent/90 text-accent-foreground w-full" disabled={isSubmitting}>
                 <PaperPlaneTilt size={16} className="mr-2" />
-                Subscribe
+                {isSubmitting ? 'Submitting…' : 'Subscribe'}
               </Button>
             </form>
             <div className="mt-4 flex flex-wrap items-center gap-2 text-xs opacity-70">

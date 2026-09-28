@@ -36,6 +36,8 @@ jobs:
         run: npm ci
 
       - name: Build site
+        env:
+          BASE_PATH: /medina-precision-pai/
         run: npm run build
 
       - name: Upload artifact

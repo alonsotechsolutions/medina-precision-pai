@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react'
+import { House, PhoneCall } from '@phosphor-icons/react'
+import { Button } from '@/components/ui/button'
 import { faqs } from '@/data/faqs'
 import { injectFaqJsonLd } from '@/lib/seo'
 import { useHashRoute } from '@/hooks/use-hash-route'
@@ -26,6 +28,7 @@ import { FaqSection } from '@/sections/FaqSection'
 import { ServiceAreasSection } from '@/sections/ServiceAreasSection'
 import { CtaBannerSection } from '@/sections/CtaBannerSection'
 import { ContactSection } from '@/sections/ContactSection'
+import { buildPhoneHref, BUSINESS_PHONE_DISPLAY } from '@/lib/site'
 
 declare global {
   interface Window {
@@ -34,7 +37,7 @@ declare global {
 }
 
 function AppContent() {
-  const { page: currentPage, printSlug } = useHashRoute()
+  const { page: currentPage, printSlug, notFound } = useHashRoute()
   usePageMeta(currentPage)
   const [showFloatingCTA, setShowFloatingCTA] = useState(false)
   const [isOwner, setIsOwner] = useState(false)
@@ -72,22 +75,50 @@ function AppContent() {
         onOpenAdminPanel={() => setShowAdminPanel(true)}
       />
       <FloatingCTA visible={showFloatingCTA} />
-      <main className="pt-44 md:pt-36 text-lg">
-        <HeroSection />
-        <StatsSection />
-        <ServicesSection />
-        <GallerySection />
-        <TestimonialsSection />
-        <WhyChooseSection />
-        <AboutSection />
-        <ProcessSection />
-        <EstimatorSection />
-        <PaletteSection />
-        <WarrantySection />
-        <FaqSection />
-        <ServiceAreasSection />
-        <CtaBannerSection />
-        <ContactSection />
+      <main id="main-content" className="pt-44 md:pt-36 text-lg">
+        {notFound ? (
+          <section className="py-24">
+            <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary">Page not found</p>
+              <h1 className="mt-4 text-4xl font-bold tracking-tight">We couldn&apos;t find that page.</h1>
+              <p className="mt-4 text-lg text-muted-foreground">
+                Please head back to the homepage or call us for help planning your painting project.
+              </p>
+              <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+                <Button asChild size="lg">
+                  <a href="#/">
+                    <House size={20} />
+                    Back to Home
+                  </a>
+                </Button>
+                <Button asChild size="lg" variant="outline">
+                  <a href={buildPhoneHref()}>
+                    <PhoneCall size={20} />
+                    {BUSINESS_PHONE_DISPLAY}
+                  </a>
+                </Button>
+              </div>
+            </div>
+          </section>
+        ) : (
+          <>
+            <HeroSection />
+            <StatsSection />
+            <ServicesSection />
+            <GallerySection />
+            <TestimonialsSection />
+            <WhyChooseSection />
+            <AboutSection />
+            <ProcessSection />
+            <EstimatorSection />
+            <PaletteSection />
+            <WarrantySection />
+            <FaqSection />
+            <ServiceAreasSection />
+            <CtaBannerSection />
+            <ContactSection />
+          </>
+        )}
       </main>
       <QuoteFormDialog />
       {isOwner && <AdminPanel open={showAdminPanel} onOpenChange={setShowAdminPanel} />}
